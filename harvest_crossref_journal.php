@@ -1,7 +1,7 @@
 <?php
 
 // fetch from CrossRef
-
+require_once(dirname(__FILE__) . '/lib.php');
 require_once(dirname(__FILE__) . '/ris.php');
 
 //--------------------------------------------------------------------------------------------------
@@ -82,13 +82,16 @@ $issn = '0158-4197'; // Emu
 
 $issn = '0373-8493'; // Mit
 
+$issn = '0181-1584'; // Cryptogamie, Mycologie (fails, need to use title)
+$issn = '0953-7562'; // Mycological research
+
 $count = 0;
 $page = 50;
 $done = false;
 while (!$done)
 {
 	$url = 'http://search.crossref.org/dois?q=' . $issn . '&header=true' . '&page=' . $page;
-//	$url = 'http://search.crossref.org/dois?q=' . urlencode('Transactions of the Linnean Society of London Botany') . '&header=true' . '&page=' . $page;
+	//$url = 'http://search.crossref.org/dois?q=' . urlencode('Cryptogamie, Mycologie') . '&header=true' . '&page=' . $page;
 
 	//echo $url . "\n";
 
