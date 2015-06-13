@@ -1,5 +1,7 @@
 
 config.inc.php
 
+cookie.txt
+
 #svn
 .svn*
