@@ -82,6 +82,12 @@ function ris_import($reference)
 			
 			$keys[] = 'url';
 			$values[] = '"' . $link->url . '"';
+			
+			if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)$/', $url, $m))
+			{
+				$guid = '10.2307/' . $m['id'];
+			}
+			
 		}
 		if ($link->anchor == 'PDF')
 		{
@@ -146,9 +152,30 @@ function ris_import($reference)
 	$sql = 'REPLACE INTO ingenta(' . join(',', $keys) . ') values('
 	. join(',', $values) . ');';
 */
+
+/*
 	$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
 	. join(',', $values) . ');';
-	 
+*/	 
+
+	// JSTOR-derived data enhance
+	$count = 0;
+	foreach ($keys as $k)
+	{
+		if ($k == 'epage')
+		{
+			if (isset($reference->doi))
+			{
+				$sql = 'UPDATE `publications` SET epage=' . $values[$count] . ' WHERE `doi`="' . $reference->doi . '";';
+			}
+			else
+			{
+				$sql = 'UPDATE `publications` SET epage=' . $values[$count] . ' WHERE `guid`="' . $guid . '";';			
+			}
+		}
+		$count++;
+	}
+
 	echo $sql . "\n";
 
 	
