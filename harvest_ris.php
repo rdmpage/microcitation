@@ -164,14 +164,7 @@ function ris_import($reference)
 	{
 		if ($k == 'epage')
 		{
-			if (isset($reference->doi))
-			{
-				$sql = 'UPDATE `publications` SET epage=' . $values[$count] . ' WHERE `doi`="' . $reference->doi . '";';
-			}
-			else
-			{
-				$sql = 'UPDATE `publications` SET epage=' . $values[$count] . ' WHERE `guid`="' . $guid . '";';			
-			}
+			$sql = 'UPDATE `publications` SET epage=' . $values[$count] . ' WHERE `guid`="' . $guid . '";';			
 		}
 		$count++;
 	}

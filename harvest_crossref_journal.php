@@ -85,6 +85,9 @@ $issn = '0373-8493'; // Mit
 $issn = '0181-1584'; // Cryptogamie, Mycologie (fails, need to use title)
 $issn = '0953-7562'; // Mycological research
 
+$issn = '0002-8444'; // American Fern Journal
+
+
 $count = 0;
 $page = 50;
 $done = false;
@@ -187,9 +190,13 @@ while (!$done)
 			
 			if (!in_array('epage', $keys))
 			{
+				$pages = array();
+				
+				// JSTOR
 				//$pages = get_pages_from_page(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]));
 				
-				$pages = get_pages_from_page_meta(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]));
+				// CrossRef
+				//$pages = get_pages_from_page_meta(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]));
 				
 				//print_r($pages);
 				
