@@ -80,14 +80,23 @@ function ris_import($reference)
 		{
 			$guid = $link->url;
 			
-			$keys[] = 'url';
-			$values[] = '"' . $link->url . '"';
-			
-			if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)$/', $url, $m))
+			if (preg_match('/http:\/\/dx.doi.org\//', $link->url))
 			{
-				$guid = '10.2307/' . $m['id'];
+				// ignore DOIs
 			}
-			
+			else
+			{			
+				$keys[] = 'url';
+				$values[] = '"' . $link->url . '"';
+				
+				if (0)
+				{			
+					if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)$/', $link->url, $m))
+					{
+						$guid = '10.2307/' . $m['id'];
+					}
+				}
+			}			
 		}
 		if ($link->anchor == 'PDF')
 		{
@@ -104,27 +113,34 @@ function ris_import($reference)
 		}
 	}
 	
-	foreach ($reference->identifier as $identifier)
+	if (isset($reference->identifier))
 	{
-		switch ($identifier->type)
+		foreach ($reference->identifier as $identifier)
 		{
-			case 'doi':
-				$guid = $identifier->id;
+			switch ($identifier->type)
+			{
+				case 'doi':
+					$guid = $identifier->id;
 				
-				$keys[] = 'doi';
-				$values[] = '"' . $identifier->id . '"';
-				break;
+					$keys[] = 'doi';
+					$values[] = '"' . $identifier->id . '"';
+					break;
 				
-			case 'handle':
-				$keys[] = 'handle';
-				$values[] = '"' . $identifier->id . '"';
-				break;
+				case 'handle':
+					$keys[] = 'handle';
+					$values[] = '"' . $identifier->id . '"';
+					break;
+
+				case 'jstor':
+					$keys[] = 'jstor';
+					$values[] = '"' . $identifier->id . '"';
+					break;
 				
-			default:
-				break;
+				default:
+					break;
+			}
 		}
-	}
-	
+	}	
 	
 	//print_r($reference);exit();
 	$authors =  array();
@@ -141,35 +157,46 @@ function ris_import($reference)
 		}
 	}
 	
+	if (isset($reference->abstract))
+	{
+		$keys[] = 'abstract';
+		$values[] = '"' . addcslashes($reference->abstract, '"') . '"';	
+	}
+	
+	
 	if ($guid == '')
 	{	
 		$guid = md5(join('', $values));
 	}
 	$keys[] = 'guid';
 	$values[] = '"' . $guid . '"';
-
-/*	
-	$sql = 'REPLACE INTO ingenta(' . join(',', $keys) . ') values('
-	. join(',', $values) . ');';
-*/
-
-/*
-	$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
-	. join(',', $values) . ');';
-*/	 
-
-	// JSTOR-derived data enhance
-	$count = 0;
-	foreach ($keys as $k)
+	
+	//echo $reference->journal->volume . "\n";
+	
+	// populate from scratch
+	if (1) // in_array($reference->journal->volume, array(26,27))) 
 	{
-		if ($k == 'epage')
-		{
-			$sql = 'UPDATE `publications` SET epage=' . $values[$count] . ' WHERE `guid`="' . $guid . '";';			
-		}
-		$count++;
+		$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
+			. join(',', $values) . ');';
+		echo $sql . "\n";
 	}
 
-	echo $sql . "\n";
+	if (0)
+	{
+		// JSTOR-derived data enhance
+		$count = 0;
+		foreach ($keys as $k)
+		{
+			if ($k == 'epage')
+			{
+				$sql = 'UPDATE `publications` SET epage=' . $values[$count] . ' WHERE `guid`="' . $guid . '";';	
+				echo $sql . "\n";		
+			}
+			$count++;
+		}
+	}
+	
+	
 
 	
 }

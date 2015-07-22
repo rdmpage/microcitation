@@ -37,16 +37,30 @@ function get_pages_from_page_meta($doi)
 	
 	$html = get($url, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/600.2.5 (KHTML, like Gecko) Version/8.0.2 Safari/600.2.5');
 	
+	//echo $html;	
+	
 	$html = str_replace("\n", "", $html);
 		
-	if (preg_match('/<meta name="citation_firstpage" content="(?<spage>\d+)" \/>/Uu', $html, $m))
+	if (preg_match('/<meta\s+name="citation_firstpage"\s+content="(?<spage>\d+)"\s*\/>/Uu', $html, $m))
 	{
 		$pages[] = $m['spage'];		
 	}
-	if (preg_match('/<meta name="citation_lastpage" content="(?<epage>\d+)" \/>/Uu', $html, $m))
+	if (preg_match('/<meta\s+name="citation_lastpage"\s+content="(?<epage>\d+)"\s*\/>/Uu', $html, $m))
 	{
 		$pages[] = $m['epage'];		
 	}
+	
+	
+	// Ingenta
+	if (count($pages) == 0)
+	{
+		// <meta name="DCTERMS.bibliographicCitation" content="Systematic Botany, 37, 2, 307-319(13)"/>
+		if (preg_match('/<meta\s+name="DCTERMS.bibliographicCitation"\s+content="(?<journal>.*),\s+(?<volume>\d+),\s+(?<issue>\d+),\s+(?<spage>\d+)-(?<epage>\d+)(\(.*\))?"\s*\/>/Uu', $html, $m))
+		{
+			$pages[] = $m['spage'];	
+			$pages[] = $m['epage'];	
+		}
+	}	
 		
 	return $pages;
 }
@@ -87,14 +101,42 @@ $issn = '0953-7562'; // Mycological research
 
 $issn = '0002-8444'; // American Fern Journal
 
+$issn = '0312-9764'; // Telopea 
+
+$issn = '0373-2967'; // Candollea
+
+$issn = '2175-7860'; // Rodriguésia
+
+$issn = '1179-3155'; // Phytotaxa
+
+$issn = '0006-808X'; 
+
+$issn = '1617-416X'; // Mycological Progress
+$issn = '0031-9465'; // Phytopathologia Mediterranea -- fail, not CrossRef
+
+$issn = '1808-2688';
+
+$issn = '0366-5232'; // Caldasia (need to fix parsing meta)
+
+$issn = '0037-8941';
+
+$issn = '0024-9637'; // Madroño
+$issn = '0006-5196'; // Blumea
+
+$issn = '0363-6445'; // Systematic Botany
+$issn = '1809-5348'; // Neodiversity
 
 $count = 0;
-$page = 50;
+$page = '';
 $done = false;
 while (!$done)
 {
 	$url = 'http://search.crossref.org/dois?q=' . $issn . '&header=true' . '&page=' . $page;
-	//$url = 'http://search.crossref.org/dois?q=' . urlencode('Cryptogamie, Mycologie') . '&header=true' . '&page=' . $page;
+	
+	$url = 'http://search.crossref.org/dois?q=' . '10.13102/neod.12.2' . '&header=true' . '&page=' . $page;
+	
+	//$url = 'http://search.crossref.org/dois?q=' . $issn . '&year=2012' . '&header=true' . '&page=' . $page;
+	//$url = 'http://search.crossref.org/dois?q=' . urlencode('A NEW VARIETY OF POTENTILLA GRACILIS (ROSACEAE) AND RE-EVALUATION OF THE POTENTILLA DRUMMONDII COMPLEX') . '&header=true' . '&page=' . $page;
 
 	//echo $url . "\n";
 
@@ -125,8 +167,18 @@ while (!$done)
 		  $params[$key][] = trim(urldecode($value));
 		}
 		
-		//if ($debug)
+		if (0)
 		{
+			// Update
+			$sql = "UPDATE publications SET guid='" . addcslashes(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]), "'") . "'"
+				. ", doi='" . addcslashes(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]), "'") . "'"
+				. " WHERE issn='$issn' AND volume='" . addcslashes($params['rft.volume'][0], "'") . "' AND spage='" . addcslashes($params['rft.spage'][0], "'") . "'"
+				. ";";
+			echo $sql . "\n";
+		}
+		else
+		{
+			// Populate
 			//print_r($params);
 	
 	
@@ -196,7 +248,7 @@ while (!$done)
 				//$pages = get_pages_from_page(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]));
 				
 				// CrossRef
-				//$pages = get_pages_from_page_meta(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]));
+				$pages = get_pages_from_page_meta(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]));
 				
 				//print_r($pages);
 				

@@ -105,10 +105,30 @@ function find ($issn, $volume, $page, $series='', $year = '')
 	
 	while (!$result->EOF) 
 	{
+		$hit = new stdclass;
+	
 		if ($result->fields['doi'])
 		{
-			$obj->results[] = $result->fields['doi'];
+			$hit->doi = $result->fields['doi'];
 		}
+		if ($result->fields['handle'])
+		{
+			$hit->handle = $result->fields['handle'];
+		}		
+		if ($result->fields['jstor'])
+		{
+			$hit->jstor = $result->fields['jstor'];
+		}
+		if ($result->fields['pdf'])
+		{
+			$hit->pdf = $result->fields['pdf'];
+		}
+		if ($result->fields['url'])
+		{
+			$hit->url = $result->fields['url'];
+		}
+				
+		$obj->results[] = $hit;
 		
 		$result->MoveNext();
 	}
