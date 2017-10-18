@@ -1,4 +1,6 @@
 
+.DS_Store
+
 config.inc.php
 
 cookie.txt
@@ -7,3 +9,6 @@ cookie.txt
 .svn*
 
 junk
+
+www/.DS_Store
+
