@@ -116,16 +116,55 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 {
 	$citeproc_obj = array();
 	$citeproc_obj['id'] = $id;
+		
 	$citeproc_obj['title'] = $reference->title;
+	
+	if (isset($reference->abstract))
+	{
+		$citeproc_obj['abstract'] = $reference->abstract;
+	}
+	
+	// multi
+	if (isset($reference->multi))
+	{
+		$citeproc_obj['multi'] = $reference->multi;
+	}
+	
 	
 	if (isset($reference->journal))
 	{	
 		$citeproc_obj['type'] = 'article-journal';
 	}
 	
-	$citeproc_obj['issued'] = new stdclass;
-	$citeproc_obj['issued']->{'date-parts'} = array();
-	$citeproc_obj['issued']->{'date-parts'}[] = array($reference->year);
+	if (isset($reference->date))
+	{
+		$citeproc_obj['issued'] = new stdclass;
+		$citeproc_obj['issued']->{'date-parts'} = array();
+		$citeproc_obj['issued']->{'date-parts'}[0] = array();
+		$parts = explode('-', $reference->date);
+		
+		$citeproc_obj['issued']->{'date-parts'}[0][] = (Integer)$parts[0];
+
+		if ($parts[1] != '00')
+		{		
+			$citeproc_obj['issued']->{'date-parts'}[0][] = (Integer)$parts[1];
+		}
+
+		if ($parts[2] != '00')
+		{		
+			$citeproc_obj['issued']->{'date-parts'}[0][] = (Integer)$parts[2];
+		}
+	
+	}
+	else
+	{
+		if (isset($reference->year))
+		{
+			$citeproc_obj['issued'] = new stdclass;
+			$citeproc_obj['issued']->{'date-parts'} = array();
+			$citeproc_obj['issued']->{'date-parts'}[] = array((Integer)$reference->year);
+		}
+	}
 	
 	if (isset($reference->author))
 	{
@@ -142,8 +181,15 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 			else
 			{
 				$a['literal'] = $author->name;
+				//$a['family'] = $author->name;
 			}
-			$citeproc_obj['author'][] = $a;			
+
+			if (isset($author->multi))
+			{
+				$a['multi']= $author->multi;
+			}
+			
+			$citeproc_obj['author'][] = $a;
 		}
 		
 	}
@@ -151,16 +197,60 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 	if (isset($reference->journal))
 	{
 		$citeproc_obj['container-title'] = $reference->journal->name;
-		$citeproc_obj['volume'] = $reference->journal->volume;
+		
+		if (isset($reference->journal->series))
+		{
+			$citeproc_obj['collection-title'] = $reference->journal->series;
+		}
+		
+		if (isset($reference->journal->volume))
+		{
+			$citeproc_obj['volume'] = $reference->journal->volume;
+		}
+		
 		if (isset($reference->journal->issue))
 		{
 			$citeproc_obj['issue'] = $reference->journal->issue;
 		}
-		$citeproc_obj['page'] = str_replace('--', '-', $reference->journal->pages);
+		if (isset($reference->journal->pages))
+		{	
+			$citeproc_obj['page'] = str_replace('--', '-', $reference->journal->pages);
+		}
+		
+		if (isset($reference->journal->identifier))
+		{
+			foreach ($reference->journal->identifier as $identifier)
+			{
+				switch ($identifier->type)
+				{
+					case 'issn':
+						$citeproc_obj['ISSN'][] = $identifier->id;
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		
+	// multi
+	if (isset($reference->journal->multi))
+	{
+		if (isset($citeproc_obj['multi']))
+		{
+			$citeproc_obj['multi']->_key->{'container-title'} = $reference->journal->multi->_key->name;
+		}
+		else
+		{
+			$citeproc_obj['multi']= $reference->journal->multi;
+		}
+	}
+		
+		
 	}
 	
 	if (isset($reference->identifier))
 	{
+		$citeproc_obj['alternative-id'] = array(); 
 		foreach ($reference->identifier as $identifier)
 		{
 			switch ($identifier->type)
@@ -168,28 +258,113 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 				case 'doi':
 					$citeproc_obj['DOI'] = $identifier->id;
 					break;
+
+				case 'handle':
+					$citeproc_obj['HANDLE'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					break;
+
+				case 'pmid':
+					$citeproc_obj['PMID'] = $identifier->id;
+					break;
+
+				case 'pmc':
+					$citeproc_obj['PMC'] = $identifier->id;
+					break;
+					
+				case 'pii':
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					break;
+
+				case 'oai':
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					break;
+					
 					
 				default:
 					break;
 			}
 		}
+		if (count($citeproc_obj['alternative-id']) == 0)
+		{
+			unset($citeproc_obj['alternative-id']);
+		}
 	}
 	
 	if (isset($reference->link))
 	{
+		$citeproc_obj['link'] = array();
+		
 		foreach ($reference->link as $link)
 		{
 			switch ($link->anchor)
 			{
 				case 'LINK':
 					$citeproc_obj['URL'] = $link->url;
+					
+					
+					if (preg_match('/mapress\.com\/zootaxa\//', $link->url))
+					{
+						$citeproc_obj['alternative-id'][] = $link->url;
+					}					
 					break;
+
+				case 'PDF':
+					// model after crossref
+					/*
+					"link": [{
+			"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_pdf&item_id=11711",
+			"content-type": "application\/pdf",
+			"content-version": "vor",
+			"intended-application": "text-mining"
+		}, {
+			"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_xml&item_id=11711",
+			"content-type": "application\/xml",
+			"content-version": "vor",
+			"intended-application": "text-mining"
+		}],*/
+					
+					
+					$pdf = new stdclass;
+					$pdf->URL = $link->url;
+					$pdf->{'content-type'} = "application/pdf";
+					
+					$citeproc_obj['link'][] = $pdf;
+					break;
+					
+				case 'XML':
+					
+					// model after crossref
+					/*
+					"link": [{
+			"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_pdf&item_id=11711",
+			"content-type": "application\/pdf",
+			"content-version": "vor",
+			"intended-application": "text-mining"
+		}, {
+			"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_xml&item_id=11711",
+			"content-type": "application\/xml",
+			"content-version": "vor",
+			"intended-application": "text-mining"
+		}],*/
+					$xml = new stdclass;
+					$xml->URL = $link->url;
+					$xml->{'content-type'} = "application/xml";
+					
+					$citeproc_obj['link'][] = $xml;
+					break;
+					
 					
 				default:
 					break;
 			}
 		}
+		if (count($citeproc_obj['link']) == 0)
+		{
+			unset($citeproc_obj['link']);
+		}
 	}
+	
 	
 	
 	return $citeproc_obj;
@@ -465,5 +640,11 @@ function reference_to_ris($reference)
 	
 	return $ris;
 }
+
+//--------------------------------------------------------------------------------------------------
+function reference_to_sici($reference)
+{
+}
+
 
 ?>

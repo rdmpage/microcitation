@@ -10,6 +10,7 @@
 require_once (dirname(__FILE__) . '/nameparse.php');
 
 $debug = false;
+//$debug = true;
 
 $logfile;
 
@@ -47,6 +48,8 @@ $key_map = array(
 function process_ris_key($key, $value, &$obj)
 {
 	global $debug;
+	
+	//echo "key=$key\n";
 	
 	switch ($key)
 	{
@@ -131,9 +134,14 @@ function process_ris_key($key, $value, &$obj)
 			$value = preg_replace('/ Of /', ' of ', $value);	
 			$value = preg_replace('/ the /', ' the ', $value);	
 			$value = preg_replace('/ and /', ' and ', $value);	
+			$value = preg_replace('/ De /', ' de ', $value);	
+			$value = preg_replace('/ Du /', ' du ', $value);	
+			$value = preg_replace('/ La /', ' la ', $value);	
 			
-			
-			$obj->journal = new stdclass;
+			if (!isset($obj->journal))
+			{
+				$obj->journal = new stdclass;
+			}
 			$obj->journal->name = $value;
 			break;
 			
@@ -155,7 +163,11 @@ function process_ris_key($key, $value, &$obj)
 			}
 			if ($obj->type == 'article')
 			{
-				$obj->journal = new stdclass;
+				if (!isset($obj->journal))
+				{
+					$obj->journal = new stdclass;
+				}
+
 				$obj->journal->name = $value;
 			}
 			break;
@@ -169,6 +181,10 @@ function process_ris_key($key, $value, &$obj)
 			
 
 		case 'IS':
+			if (!isset($obj->journal))
+			{
+				$obj->journal = new stdclass;
+			}
 			$obj->journal->issue = $value;
 			break;
 			
@@ -183,8 +199,13 @@ function process_ris_key($key, $value, &$obj)
 			else
 			{
 				$identifier->type = 'issn';
+				
+				if (!isset($obj->journal))
+				{
+					$obj->journal = new stdclass;
+				}
 				$obj->journal->identifier[] = $identifier;	
-			}					
+			}	
 			break;
 
 		case 'N2':
@@ -328,30 +349,62 @@ function process_ris_key($key, $value, &$obj)
 			break;
 
 		case 'UR':
-			$link = new stdclass;
-			$link->url = $value;
-			$link->anchor = 'LINK';
-			$obj->link[] = $link;
 			
-			// extract...
-			if (preg_match('/http:\/\/hdl.handle.net\/(?<id>.*)/', $value, $m))
+			// WOS/ZOOREC
+			if (preg_match('/\<Go to ISI\>:\/\/(?<id>.*)/', $value, $m))
 			{
 				$identifier = new stdclass;
-				$identifier->type = 'handle';
+				$identifier->type = 'wos';
 				$identifier->id = $m['id'];
 				
-				$obj->identifier[] = $identifier;				
+				$obj->identifier[] = $identifier;	
 			}
+			else
+			{
+				$link = new stdclass;
+				$link->url = $value;
+			
+				if (preg_match('/\.pdf$/', $value))
+				{
+					$link->anchor = 'PDF';
+				}
+				else
+				{
+					$link->anchor = 'LINK';
+				}
+			
+				$obj->link[] = $link;
+			
+				// extract...
+				if (preg_match('/http:\/\/hdl.handle.net\/(?<id>.*)/', $value, $m))
+				{
+					$identifier = new stdclass;
+					$identifier->type = 'handle';
+					$identifier->id = $m['id'];
+				
+					$obj->identifier[] = $identifier;				
+				}
+			
+				if (preg_match('/https:\/\/digital.csic.es\/handle\/(?<id>.*)/', $value, $m))
+				{
+					$identifier = new stdclass;
+					$identifier->type = 'handle';
+					$identifier->id = $m['id'];
+				
+					$obj->identifier[] = $identifier;				
+				}
+			
 
-			if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>.*)/', $value, $m))
-			{
-				$identifier = new stdclass;
-				$identifier->type = 'jstor';
-				$identifier->id = $m['id'];
+				if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>.*)/', $value, $m))
+				{
+					$identifier = new stdclass;
+					$identifier->type = 'jstor';
+					$identifier->id = $m['id'];
 				
-				$obj->identifier[] = $identifier;				
-			}
+					$obj->identifier[] = $identifier;				
+				}
 			
+			}			
 			break;			
 
 		case 'ID':
@@ -476,6 +529,12 @@ function import_ris_file($filename, $callback_func = '')
 			{
 				$obj->type = 'article';
 			}
+			// Ingenta
+			if ('ABST' == $value)
+			{
+				$obj->type = 'article';
+			}
+			
 			if ('BOOK' == $value)
 			{
 				$obj->type = 'book';

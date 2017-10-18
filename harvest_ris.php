@@ -10,7 +10,17 @@ function ris_import($reference)
 {
 	//print_r($reference);
 	
+	
+	// post processing
+	if (preg_match('/s(?<series>\d+)-(?<volume>\d+)/', $reference->journal->volume, $m))
+	{
+		$reference->journal->series = $m['series'];
+		$reference->journal->volume = $m['volume'];
+	}
+	
 	$guid = '';
+	
+	$pdf = '';
 	
 	$keys = array();
 	$values= array();
@@ -19,50 +29,74 @@ function ris_import($reference)
 	$values[] = '"' . addcslashes(strip_tags($reference->title), '"') . '"';
 
 	// journal
-	
+		
 	$journal = $reference->journal->name;
-	$series = '';
-	if (preg_match('/^(?<journal>.*),\s+[S|s]eries\s+(?<series>\d+)$/', $journal, $m))
+	if (!isset($reference->journal->series ))
 	{
-		$journal = $m['journal'];
-		$series = $m['series'];
+		if (preg_match('/^(?<journal>.*),\s+[S|s]eries\s+(?<series>\d+)$/', $journal, $m))
+		{
+			$journal = $m['journal'];
+			$reference->journal->series = $m['series'];
+		}
 	}
-	
+		
 	$keys[] = 'journal';
 	$values[] = '"' . addcslashes($journal, '"') . '"';
 	
-	if ($series != '')
+	if (isset($reference->journal->series))
 	{
 		$keys[] = 'series';
-		$values[] = '"' . addcslashes($series, '"') . '"';	
+		$values[] = '"' . addcslashes($reference->journal->series, '"') . '"';	
 	}
-
-	$keys[] = 'volume';
-	$values[] = '"' . addcslashes($reference->journal->volume, '"') . '"';
+	
+	if (isset($reference->journal->volume))
+	{
+		$keys[] = 'volume';
+		$values[] = '"' . addcslashes($reference->journal->volume, '"') . '"';
+	}
 	
 	if (isset($reference->journal->issue))
 	{
 		$keys[] = 'issue';
 		$values[] = '"' . addcslashes($reference->journal->issue, '"') . '"';	
-	}
+	}	
 	
-	if (preg_match('/(?<spage>\d+)--(?<epage>\d+)/', $reference->journal->pages, $m))
+	if (isset($reference->journal->pages))
 	{
-		$keys[] = 'spage';
-		$values[] = '"' . addcslashes($m['spage'], '"') . '"';
-		$keys[] = 'epage';
-		$values[] = '"' . addcslashes($m['epage'], '"') . '"';	
+		if (preg_match('/(?<spage>(\d+|\w+))--(?<epage>(\d+|\w+))/', $reference->journal->pages, $m))
+		{
+			$keys[] = 'spage';
+			$values[] = '"' . addcslashes($m['spage'], '"') . '"';
+			$keys[] = 'epage';
+			$values[] = '"' . addcslashes($m['epage'], '"') . '"';	
+		}
+		else
+		{
+			$keys[] = 'spage';
+			$values[] = '"' . addcslashes($reference->journal->pages, '"') . '"';
+		}
 	}
 	
 	if (isset($reference->journal->identifier))
 	{
+		$issn = '';
 		foreach ($reference->journal->identifier as $identifier)
 		{
 			switch ($identifier->type)
 			{
 				case 'issn':
-					$keys[] = 'issn';
-					$values[] = '"' . $identifier->id . '"';
+					if ($issn == '')
+					{
+						$keys[] = 'issn';
+						$values[] = '"' . $identifier->id . '"';
+						
+						$issn = $identifier->id;
+					}
+					else
+					{
+						$keys[] = 'eissn';
+						$values[] = '"' . $identifier->id . '"';
+					}					
 					break;
 								
 				default:
@@ -74,45 +108,59 @@ function ris_import($reference)
 	$keys[] = 'year';
 	$values[] = '"' . addcslashes($reference->year, '"') . '"';
 	
-	foreach ($reference->link as $link)
+	if (isset($reference->date))
 	{
-		if ($link->anchor == 'LINK')
-		{
-			$guid = $link->url;
-			
-			if (preg_match('/http:\/\/dx.doi.org\//', $link->url))
-			{
-				// ignore DOIs
-			}
-			else
-			{			
-				$keys[] = 'url';
-				$values[] = '"' . $link->url . '"';
-				
-				if (0)
-				{			
-					if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)$/', $link->url, $m))
-					{
-						$guid = '10.2307/' . $m['id'];
-					}
-				}
-			}			
-		}
-		if ($link->anchor == 'PDF')
-		{
-			$keys[] = 'pdf';
-			
-			$pdf = $link->url ;
-			
-			if (preg_match('/wenjianming=(?<pdf>.*)&/Uu', $pdf, $m))
-			{
-				$pdf = 'http://www.plantsystematics.com/qikan/manage/wenzhang/' . $m['pdf'] . '.pdf';
-			}
-			
-			$values[] = '"' . $pdf . '"';
-		}
+		$keys[] = 'date';
+		$values[] = '"' . $reference->date . '"';
 	}
 	
+	if (isset($reference->link))
+	{
+		foreach ($reference->link as $link)
+		{
+			if ($link->anchor == 'LINK')
+			{
+				$guid = $link->url;
+			
+				if (preg_match('/http:\/\/dx.doi.org\//', $link->url))
+				{
+					// ignore DOIs
+				}
+				else
+				{			
+					$keys[] = 'url';
+					$values[] = '"' . $link->url . '"';
+				
+					if (1)
+					{			
+						if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)$/', $link->url, $m))
+						{
+							$guid = '10.2307/' . $m['id'];
+						}
+					}
+				}			
+			}
+			if ($link->anchor == 'PDF')
+			{
+				$keys[] = 'pdf';
+			
+				$pdf = $link->url ;
+				
+				if ($guid == '')
+				{
+					$guid = $link->url;
+				}
+			
+				if (preg_match('/wenjianming=(?<pdf>.*)&/Uu', $pdf, $m))
+				{
+					$pdf = 'http://www.plantsystematics.com/qikan/manage/wenzhang/' . $m['pdf'] . '.pdf';
+				}
+			
+				$values[] = '"' . $pdf . '"';
+			}
+		}
+	}
+		
 	if (isset($reference->identifier))
 	{
 		foreach ($reference->identifier as $identifier)
@@ -127,12 +175,23 @@ function ris_import($reference)
 					break;
 				
 				case 'handle':
+					$guid = $identifier->id;
+				
 					$keys[] = 'handle';
 					$values[] = '"' . $identifier->id . '"';
 					break;
 
 				case 'jstor':
 					$keys[] = 'jstor';
+					$values[] = '"' . $identifier->id . '"';
+					break;
+
+				case 'wos':
+					if ($guid == '')
+					{
+						$guid = $identifier->id;
+					}
+					$keys[] = 'wos';
 					$values[] = '"' . $identifier->id . '"';
 					break;
 				
@@ -142,13 +201,22 @@ function ris_import($reference)
 		}
 	}	
 	
-	//print_r($reference);exit();
+	//print_r($reference);
+	
+	
 	$authors =  array();
 	if (isset($reference->author))
 	{
 		foreach ($reference->author as $author)
 		{
-			$authors[] = $author->lastname . ', ' . $author->firstname;
+			if (isset($author->lastname))
+			{
+				$authors[] = $author->lastname . ', ' . $author->firstname;
+			}
+			else
+			{
+				$authors[] = $author->name;
+			}
 		}
 		if (count($authors) > 0)
 		{
@@ -164,22 +232,178 @@ function ris_import($reference)
 	}
 	
 	
+	if (isset($reference->publisher_id))
+	{
+		if (preg_match('/oai:/', $reference->publisher_id))
+		{
+			$keys[] = 'oai';
+			$values[] = '"' . addcslashes($reference->publisher_id, '"') . '"';	
+		}
+	}
+	
+	
 	if ($guid == '')
 	{	
 		$guid = md5(join('', $values));
 	}
+	
+	
+	if ($issn == '0368-0177')
+	{
+		$guid = $issn . '-' . basename($guid);
+	}
+	
+	
+	
+	
 	$keys[] = 'guid';
 	$values[] = '"' . $guid . '"';
 	
 	//echo $reference->journal->volume . "\n";
 	
-	// populate from scratch
+	// populate from scratch (default)
 	if (1) // in_array($reference->journal->volume, array(26,27))) 
 	{
 		$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
 			. join(',', $values) . ');';
 		echo $sql . "\n";
 	}
+	
+	// Import JSTOR prior to a given date
+	if (0) 
+	{
+		// && in_array($reference->year, array(2005,2006,2007)))
+		if (isset($reference->year)  && ($reference->year < 2002))
+		{
+			$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
+				. join(',', $values) . ');';
+			echo $sql . "\n";
+		}
+	}
+	
+	
+	// Import JSTOR if it has a DOI
+	if (0) 
+	{
+		if (isset($reference->year))
+		{
+			if (preg_match('/^10\./', $guid))
+			{
+				$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
+					. join(',', $values) . ');';
+				echo $sql . "\n";
+			}
+		}
+	}
+	
+	// Add data to existing record
+	if (0) 
+	{
+		
+			$qualifiers = array();
+			
+			$count = 0;
+			foreach ($keys as $k)
+			{
+				switch ($k)
+				{
+					case 'issn':
+						$qualifiers[] = 'issn=' . $values[$count];
+						break;
+					case 'volume':
+						$qualifiers[] = 'volume=' . $values[$count];
+						break;
+					case 'spage':
+						$qualifiers[] = 'spage=' . $values[$count];
+						break;
+						
+					default:
+						break;
+				}
+				$count++;
+			}
+			
+			//print_r($qualifiers);
+			
+			if (count($qualifiers) == 3)
+			{
+				if (isset($reference->link))
+				{
+					foreach ($reference->link as $link)
+					{
+						if ($link->anchor == 'LINK')
+						{
+							
+							$sql = 'UPDATE publications SET url="' . $link->url . '"'
+								. ' WHERE ' . join(" AND ", $qualifiers) . ' AND doi IS NOT NULL;';
+
+							echo $sql . "\n";
+						}
+						if ($link->anchor == 'PDF')
+						{
+							$keys[] = 'pdf';
+			
+							$pdf = $link->url ;
+
+							$sql = 'UPDATE publications SET pdf="' . $link->url . '"'
+								. ' WHERE ' . join(" AND ", $qualifiers) . ' AND doi IS NOT NULL;';
+
+							echo $sql . "\n";
+						}
+					}
+				}
+			
+			
+			}
+		
+	}
+	
+	
+	// Add JSTOR to existing record
+	if (0) 
+	{
+		if (isset($reference->year) && ($reference->year >= 2002))
+		{
+		
+			$qualifiers = array();
+			
+			$count = 0;
+			foreach ($keys as $k)
+			{
+				switch ($k)
+				{
+					case 'issn':
+						$qualifiers[] = 'issn=' . $values[$count];
+						break;
+					case 'volume':
+						$qualifiers[] = 'volume=' . $values[$count];
+						break;
+					case 'spage':
+						$qualifiers[] = 'spage=' . $values[$count];
+						break;
+						
+					default:
+						break;
+				}
+				$count++;
+			}
+			
+			//print_r($qualifiers);
+			
+			if (count($qualifiers) == 3)
+			{
+				//$sql = 'UPDATE publications SET jstor=' . str_replace('http://www.jstor.org/stable/', '', $guid)
+				//	. ' WHERE ' . join(" AND ", $qualifiers) . ';';
+				$sql = 'UPDATE publications SET jstor=' . str_replace('10.2307/', '', $guid)
+					. ' WHERE ' . join(" AND ", $qualifiers) . ';';
+
+				echo $sql . "\n";
+			}
+		}
+	}
+	
+
+	
 
 	if (0)
 	{
@@ -196,6 +420,16 @@ function ris_import($reference)
 		}
 	}
 	
+	
+	// Add PDF to existing record
+	if (0) 
+	{
+		if ($pdf != '')
+		{
+			$sql = 'UPDATE publications SET pdf="' . $pdf . '" WHERE guid="' . $guid . '" AND pdf IS NULL;';
+			echo $sql . "\n";
+		}
+	}	
 	
 
 	

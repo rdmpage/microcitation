@@ -1,6 +1,6 @@
 <?php
 
-// import from RIS and selectively update
+// import JSTOR from RIS and either add, or update records with existing DOI
 
 require_once(dirname(__FILE__) . '/config.inc.php');
 require_once(dirname(__FILE__) . '/adodb5/adodb.inc.php');
@@ -14,6 +14,116 @@ $db->Connect("localhost",
 // Ensure fields are (only) indexed by column name
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 
+//--------------------------------------------------------------------------------------------------
+function get_value_from_key($keys, $values, $k)
+{
+	$v = '';
+	$count = 0;
+	while ($count < count($keys))
+	{
+		if ($keys[$count] == $k)
+		{
+			break;
+		}
+		$count++;
+	}
+	if ($count < count($keys))
+	{
+		$v = $values[$count];
+	}
+	return $v;
+}
+
+//--------------------------------------------------------------------------------------------------
+function have_guid($guid)
+{
+	global $db;
+	
+	$have = false;
+
+	$sql = 'SELECT * FROM publications WHERE guid="' . $guid . '" LIMIT 1;';
+	$result = $db->Execute($sql);
+	if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
+
+	if ($result->NumRows() == 1)
+	{
+		$have = true;
+	}
+	return $have;
+}
+
+//--------------------------------------------------------------------------------------------------
+function have_jstor($jstor)
+{
+	global $db;
+	
+	$have = false;
+
+	$sql = 'SELECT * FROM publications WHERE jstor="' . $jstor . '" LIMIT 1;';
+	$result = $db->Execute($sql);
+	if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
+
+	if ($result->NumRows() == 1)
+	{
+		$have = true;
+	}
+	return $have;
+}
+
+//--------------------------------------------------------------------------------------------------
+function have_reference($keys, $values, $update_keys = array())
+{
+	global $db;
+	
+	$update_sql = '';
+	
+	$sql = '';
+	
+	$q = array();
+	$count = 0;
+	foreach ($keys as $k)
+	{
+		switch ($k)
+		{
+			case 'issn':
+			case 'volume':
+			case 'spage':
+				$q[] = $k . '=' . $values[$count];
+				break;
+				
+			default:
+				break;
+		}
+		$count++;
+	}
+	
+	//print_r($q);
+	
+	if (count($q) == 3)
+	{
+		$sql = 'SELECT * FROM publications WHERE ' . join(" AND ", $q) . ' LIMIT 1';
+		
+		echo "-- $sql\n";
+		
+		$result = $db->Execute($sql);
+		if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
+
+		if ($result->NumRows() == 1)
+		{
+			$update_sql = 'UPDATE publications SET ';
+			
+			$u = array();
+			foreach ($update_keys as $uk => $uv)
+			{
+				$u[] = $uk . '="' . addcslashes($uv, '"') . '"';
+			}
+			$update_sql .= join(",", $u);
+			$update_sql .= ' WHERE ' . join(" AND ", $q) . ';';
+		}
+	}
+	return $update_sql;
+}
+
 
 
 //--------------------------------------------------------------------------------------------------
@@ -24,6 +134,8 @@ function ris_import($reference)
 	//print_r($reference);
 	
 	$guid = '';
+	$doi = '';
+	$jstor = 0;
 	
 	$keys = array();
 	$values= array();
@@ -106,7 +218,16 @@ function ris_import($reference)
 				{
 					if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)$/', $link->url, $m))
 					{
-						$guid = '10.2307/' . $m['id'];
+						if (0)
+						{
+							$guid = $link->url;
+						}
+						else
+						{
+							$guid = '10.2307/' . $m['id'];
+						}
+						
+						$jstor = $m['id'];
 					}
 				}
 			}			
@@ -147,6 +268,8 @@ function ris_import($reference)
 				case 'jstor':
 					$keys[] = 'jstor';
 					$values[] = '"' . $identifier->id . '"';
+					
+					$jstor = $identifier->id;
 					break;
 				
 				default:
@@ -186,27 +309,49 @@ function ris_import($reference)
 	
 	
 	// Exists?
-	$sql = 'SELECT * FROM publications WHERE guid="' . $guid . '" LIMIT 1;';
-
-	$result = $db->Execute($sql);
-	if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
-	
-	if ($result->NumRows() == 1)
+	if (have_guid($guid))
 	{
 		// have already
-		$sql = "-- have already";
+		$sql = "-- have $guid already, skip...\n";	
+		echo $sql;	
+		
+		$update_sql = 'UPDATE publications SET epage=' . get_value_from_key($keys, $values, 'epage') . ' WHERE guid="' . $guid . '";';
+		echo $update_sql . "\n";
+		
 	}
+	/*
 	else
 	{
-		// add
-		$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
-			. join(',', $values) . ');';
+		if ($jstor != 0)
+		{
+			if (have_jstor($jstor))
+			{
+				// have already this JSTOR id
+				$sql = "-- have JSTOR $jstor already, skip...\n";
+				echo $sql;
+			}
+			else
+			{
+				// don't have this JSTOR record, either we don't have reference, 
+				// or reference has external DOI
+				$update_sql = have_reference($keys, $values, array('jstor' => $jstor));
+				if ($update_sql != '')
+				{
+					// add JSTOR id to record
+					echo $update_sql . "\n";
+				}
+				else
+				{
+					// add reference
+					$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
+						. join(',', $values) . ');';
+					echo $sql . "\n";
+				}
+			}
+		}
+		
 	}
-	
-	echo $sql . "\n";
-
-	
-	echo $sql . "\n";
+	*/
 
 	
 }
