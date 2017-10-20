@@ -43,20 +43,25 @@ function get_meta($doi, &$keys, &$values)
 						break;		
 					*/	
 			
+					/*
 					case 'citation_firstpage':
 						$keys[] = 'spage';
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
 						break;
-
+					*/
+					
+					
 					case 'citation_lastpage':
 						$keys[] = 'epage';
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
 						break;
 						
+					/*
 					case 'citation_volume':
 						$keys[] = 'volume';
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
 						break;
+					*/
 												
 					case 'citation_abstract_html_url':
 						$keys[] = 'url';
@@ -775,8 +780,14 @@ $issn = '0002-9122';
 $issn = '0030-8870';
 $issn = '0006-8055';
 
-for ($y = 2001; $y <= 2017; $y++)
-//$y = 1882;
+$issn = '0101-3580';
+$issn = '0066-7870';
+
+
+$issn = '0378-2697'; // '0029-8948'; // 1858-1973 Österreichische Botanische Zeitschrift
+
+
+for ($y = 1868; $y <= 1973; $y++)
 {
 	$count = 0;
 	$page = '';
@@ -947,7 +958,6 @@ for ($y = 2001; $y <= 2017; $y++)
 					$values[] = "'" . addcslashes($issue, "'") . "'";
 				}
 	
-	
 				if (isset($params['rft.spage']))
 				{
 					if (!in_array('spage', $keys))
@@ -956,6 +966,7 @@ for ($y = 2001; $y <= 2017; $y++)
 						$values[] = "'" . addcslashes($params['rft.spage'][0], "'") . "'";
 					}
 				}
+				
 	
 				if (isset($params['rft.epage']))
 				{
@@ -975,6 +986,19 @@ for ($y = 2001; $y <= 2017; $y++)
 				{
 					get_meta($doi, $keys, $values);
 				}
+
+				if ($issn == '0101-3580') // get PDF
+				{
+					get_meta($doi, $keys, $values);
+				}
+
+				if ($issn == '0066-7870') // get PDF
+				{
+					get_meta($doi, $keys, $values);
+				}
+				
+				
+
 
 			
 				$enhance = false;

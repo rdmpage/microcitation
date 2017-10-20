@@ -166,6 +166,8 @@ $issn = '0740-2783';
 
 $sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
 
+$sql = 'SELECT * FROM publications WHERE journal="Malakozoologische Blätter"';
+
 
 //$sql .= ' AND year = 1949';
 //$sql .= ' AND volume = 23 AND ISSUE IS NOT NULL';
