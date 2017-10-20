@@ -292,6 +292,7 @@ if ($result->NumRows() == 1)
 				$reference->multi->_key->{$key}->{$language} = $value;
 				break;
 				
+			
 			case 'journal':
 				if (!isset($reference->journal->multi))
 				{
@@ -304,6 +305,7 @@ if ($result->NumRows() == 1)
 				}
 				$reference->journal->multi->_key->name->{$language} = $value;			
 				break;
+			
 				
 			case 'authors':
 				// big assumption, we've parsed author names OK
@@ -332,11 +334,11 @@ if ($result->NumRows() == 1)
 						$reference->author[$i]->multi = new stdclass;
 						$reference->author[$i]->multi->_key = new stdclass;
 					}
-					if (!isset($reference->author[$i]->multi->_key->name))
+					if (!isset($reference->author[$i]->multi->_key->literal))
 					{
-						$reference->author[$i]->multi->_key->name  = new stdclass;
+						$reference->author[$i]->multi->_key->literal  = new stdclass;
 					}
-					$reference->author[$i]->multi->_key->name->{$language} = $authors[$i];								
+					$reference->author[$i]->multi->_key->literal->{$language} = $authors[$i];								
 				}
 				break;
 				
@@ -370,8 +372,12 @@ if ($result->NumRows() == 1)
 	
 	$c = reference_to_citeprocjs($reference);
 	
-	
-	//print_r($c);
+	if (0)
+	{
+		echo '<pre>';
+		print_r($c);
+		echo '</pre>';
+	}
 	
 	$link_index = -1;
 	
