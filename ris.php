@@ -152,6 +152,10 @@ function process_ris_key($key, $value, &$obj)
 			}
 			else
 			{
+				if (!isset($obj->journal))
+				{
+					$obj->journal = new stdclass;
+				}
 				$obj->journal->volume = $value;
 			}
 			break;
@@ -189,11 +193,12 @@ function process_ris_key($key, $value, &$obj)
 			break;
 			
 		case 'SN':
-			$identifier = new stdclass;
+			$identifier = new stdclass;			
 			$identifier->id = $value;
 			if ($obj->type == 'book')
 			{
 				$identifier->type = 'isbn';
+				$identifier->id = str_replace('-', '', $identifier->id);
 				$obj->identifier[] = $identifier;	
 			}
 			else
