@@ -88,7 +88,7 @@ function reference_to_citation_string($reference)
 		}		
 		if (isset($reference->journal->pages))
 		{
-			$citation .= ': ' . $reference->journal->pages;
+			$citation .= ': ' . str_replace('--', '-', $reference->journal->pages);
 		}
 	}
 	else
@@ -116,7 +116,9 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 {
 	$citeproc_obj = array();
 	$citeproc_obj['id'] = $id;
-		
+
+	$citeproc_obj['unstructured'] = reference_to_citation_string($reference);
+	
 	$citeproc_obj['title'] = $reference->title;
 	
 	if (isset($reference->abstract))
@@ -165,6 +167,16 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 			$citeproc_obj['issued']->{'date-parts'}[] = array((Integer)$reference->year);
 		}
 	}
+	
+	if (isset($reference->publisher))
+	{
+		$citeproc_obj['publisher'] = $reference->publisher;
+	}
+	if (isset($reference->publoc))
+	{
+		$citeproc_obj['publisher-place'] = $reference->publoc;
+	}
+	
 	
 	if (isset($reference->author))
 	{
@@ -257,6 +269,7 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 			{
 				case 'doi':
 					$citeproc_obj['DOI'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'DOI:' . $identifier->id;
 					break;
 
 				case 'handle':
@@ -264,16 +277,31 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 					$citeproc_obj['alternative-id'][] = $identifier->id;
 					break;
 
+				case 'isbn':
+				case 'isbn10':
+				case 'isbn13':
+					$citeproc_obj['ISBN'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					break;
+
+				case 'jstor':
+					$citeproc_obj['JSTOR'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'JSTOR:' . $identifier->id;
+					break;
+
 				case 'pmid':
 					$citeproc_obj['PMID'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'PMID:' . $identifier->id;
 					break;
 
 				case 'pmc':
 					$citeproc_obj['PMC'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'PMC:' . $identifier->id;
 					break;
 					
 				case 'pii':
 					$citeproc_obj['alternative-id'][] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'PII:' . $identifier->id;
 					break;
 
 				case 'oai':
@@ -285,84 +313,97 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 					break;
 			}
 		}
-		if (count($citeproc_obj['alternative-id']) == 0)
-		{
-			unset($citeproc_obj['alternative-id']);
-		}
 	}
 	
 	if (isset($reference->link))
 	{
+		$links = array();
+	
 		$citeproc_obj['link'] = array();
 		
 		foreach ($reference->link as $link)
 		{
-			switch ($link->anchor)
+			if (!in_array($link->url, $links))
 			{
-				case 'LINK':
-					$citeproc_obj['URL'] = $link->url;
+				$links[] = $link->url;
+				switch ($link->anchor)
+				{
+					case 'LINK':
+						$citeproc_obj['URL'] = $link->url;
 					
 					
-					if (preg_match('/mapress\.com\/zootaxa\//', $link->url))
-					{
 						$citeproc_obj['alternative-id'][] = $link->url;
-					}					
-					break;
+						break;
 
-				case 'PDF':
-					// model after crossref
-					/*
-					"link": [{
-			"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_pdf&item_id=11711",
-			"content-type": "application\/pdf",
-			"content-version": "vor",
-			"intended-application": "text-mining"
-		}, {
-			"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_xml&item_id=11711",
-			"content-type": "application\/xml",
-			"content-version": "vor",
-			"intended-application": "text-mining"
-		}],*/
+					case 'PDF':
+						// model after crossref
+						/*
+						"link": [{
+				"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_pdf&item_id=11711",
+				"content-type": "application\/pdf",
+				"content-version": "vor",
+				"intended-application": "text-mining"
+			}, {
+				"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_xml&item_id=11711",
+				"content-type": "application\/xml",
+				"content-version": "vor",
+				"intended-application": "text-mining"
+			}],*/
 					
 					
-					$pdf = new stdclass;
-					$pdf->URL = $link->url;
-					$pdf->{'content-type'} = "application/pdf";
+						$pdf = new stdclass;
+						$pdf->URL = $link->url;
+						$pdf->{'content-type'} = "application/pdf";
 					
-					$citeproc_obj['link'][] = $pdf;
-					break;
+						$citeproc_obj['link'][] = $pdf;
+						
+						$citeproc_obj['alternative-id'][] = $link->url;
+						break;
 					
-				case 'XML':
+					case 'XML':
 					
-					// model after crossref
-					/*
-					"link": [{
-			"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_pdf&item_id=11711",
-			"content-type": "application\/pdf",
-			"content-version": "vor",
-			"intended-application": "text-mining"
-		}, {
-			"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_xml&item_id=11711",
-			"content-type": "application\/xml",
-			"content-version": "vor",
-			"intended-application": "text-mining"
-		}],*/
-					$xml = new stdclass;
-					$xml->URL = $link->url;
-					$xml->{'content-type'} = "application/xml";
+						// model after crossref
+						/*
+						"link": [{
+				"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_pdf&item_id=11711",
+				"content-type": "application\/pdf",
+				"content-version": "vor",
+				"intended-application": "text-mining"
+			}, {
+				"URL": "https:\/\/zookeys.pensoft.net\/lib\/ajax_srv\/article_elements_srv.php?action=download_xml&item_id=11711",
+				"content-type": "application\/xml",
+				"content-version": "vor",
+				"intended-application": "text-mining"
+			}],*/
+						$xml = new stdclass;
+						$xml->URL = $link->url;
+						$xml->{'content-type'} = "application/xml";
 					
-					$citeproc_obj['link'][] = $xml;
-					break;
+						$citeproc_obj['link'][] = $xml;
+						break;
 					
 					
-				default:
-					break;
+					default:
+						break;
+				}
 			}
 		}
 		if (count($citeproc_obj['link']) == 0)
 		{
 			unset($citeproc_obj['link']);
 		}
+	}
+	
+	$citeproc_obj['alternative-id'] = array_unique($citeproc_obj['alternative-id']);
+	if (count($citeproc_obj['alternative-id']) == 0)
+	{
+		unset($citeproc_obj['alternative-id']);
+	}
+	
+	
+	if (isset($reference->thumbnail))
+	{	
+		$citeproc_obj['thumbnail'] = $reference->thumbnail;
 	}
 	
 	
