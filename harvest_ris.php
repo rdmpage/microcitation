@@ -131,7 +131,7 @@ function ris_import($reference)
 					$keys[] = 'url';
 					$values[] = '"' . $link->url . '"';
 				
-					if (1)
+					if (0)
 					{			
 						if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)$/', $link->url, $m))
 						{
@@ -180,6 +180,19 @@ function ris_import($reference)
 					$keys[] = 'handle';
 					$values[] = '"' . $identifier->id . '"';
 					break;
+					
+				case 'isbn':
+					if (strlen($identifier->id) == 13)
+					{
+						$keys[] = 'isbn13';
+					}
+					else
+					{
+						$keys[] = 'isbn10';
+					}
+					$values[] = '"' . $identifier->id . '"';
+					break;
+					
 
 				case 'jstor':
 					$keys[] = 'jstor';
@@ -262,7 +275,8 @@ function ris_import($reference)
 	//echo $reference->journal->volume . "\n";
 	
 	// populate from scratch (default)
-	if (1) // in_array($reference->journal->volume, array(26,27))) 
+	if (1)
+	//if (in_array($reference->journal->volume, array(6,7,8,9,10,11))) 
 	{
 		$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
 			. join(',', $values) . ');';
