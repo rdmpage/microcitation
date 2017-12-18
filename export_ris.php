@@ -164,9 +164,16 @@ $issn = '0044-586X';
 $issn = '0340-4943';
 $issn = '0740-2783';
 
+$issn ='0312-3162';
+
+$issn ='0034-740X';
+$issn ='0312-3162';
+$issn ='1684-4130';
+$issn ='1815-8242';
+
 $sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
 
-$sql = 'SELECT * FROM publications WHERE journal="Malakozoologische Blätter"';
+//$sql = 'SELECT * FROM publications WHERE journal="Malakozoologische Blätter"';
 
 
 //$sql .= ' AND year = 1949';
@@ -174,7 +181,7 @@ $sql = 'SELECT * FROM publications WHERE journal="Malakozoologische Blätter"';
 
 //$sql .= ' AND year < 1901 and volume <> 0 AND spage is not null';
 
- $sql .= ' AND volume = 23';
+// $sql .= ' AND volume = 18';
 
 //$sql = 'SELECT * FROM publications where journal like "Studies and%"';
 

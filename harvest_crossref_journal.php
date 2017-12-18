@@ -786,8 +786,18 @@ $issn = '0066-7870';
 
 $issn = '0378-2697'; // '0029-8948'; // 1858-1973 Österreichische Botanische Zeitschrift
 
+$issn = '0312-9764';
 
-for ($y = 1868; $y <= 1973; $y++)
+$issn = '1464-3766';
+
+//$issn = '2200-4025';
+
+$issn = '2327-2929';
+$issn = '0960-4286';
+$issn = '0960-4286';
+$issn = '0181-1584';
+
+for ($y = 1999; $y <= 2001; $y++)
 {
 	$count = 0;
 	$page = '';
@@ -804,6 +814,7 @@ for ($y = 1868; $y <= 1973; $y++)
 		$url = 'http://search.crossref.org/dois?q=' . $issn . '&header=true' . '&page=' . $page . '&year=' . $y; 
 	
 	
+		//$url = 'http://search.crossref.org/dois?q=Telopea&year=1922&publication=Telopea' . '&header=true' . '&page=' . $page . '&year=' . $y; 
 	
 	
 		//$url = 'http://search.crossref.org/dois?q=' . '10.5642/aliso.20123001.07' . '&header=true' . '&page=' . $page;

@@ -26,14 +26,15 @@ $db->EXECUTE("set names 'utf8'");
 
 
 
-$issn = '0065-1710';
-$years = array('2004');
+$issn = '1815-8242';
+$years = array('2016', '2017');
 
-//foreach ($years as $year)
-for ($year = 2005; $year < 2017; $year++)
+foreach ($years as $year)
+//for ($year = 2005; $year < 2017; $year++)
 {
 	// 1. get 
 	$sql = 'SELECT * FROM `publications` WHERE `issn` = "' . $issn . '" AND `doi` IS NOT NULL AND `year`="' . $year . '";';
+	//$sql = 'SELECT * FROM `publications` WHERE `issn` = "' . $issn . '" AND `doi` IS NULL AND `year`="' . $year . '";';
 	
 	$result = $db->Execute($sql);
 	if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
@@ -75,12 +76,19 @@ for ($year = 2005; $year < 2017; $year++)
 			
 			// check
 			$percent = 0;
-			similar_text($title, $result->fields['title'], $percent);
+			similar_text(strtolower($title), strtolower($result->fields['title']), $percent);
 			if ($percent > 80)
 			{
-				echo 'UPDATE `publications` SET pdf="' . $result->fields['pdf'] . '" WHERE `doi`="' . $doi . '";' . "\n";
-				echo 'DELETE FROM `publications` WHERE guid="' . $result->fields['pdf'] . '";' . "\n";
+				//echo 'UPDATE `publications` SET pdf="' . $result->fields['pdf'] . '" WHERE `doi`="' . $doi . '";' . "\n";
+				//echo 'DELETE FROM `publications` WHERE guid="' . $result->fields['pdf'] . '";' . "\n";
+
+
+				echo 'UPDATE `publications` SET doi="' . $doi . '" WHERE `guid`="' . $result->fields['url'] . '";' . "\n";
+				echo 'DELETE FROM `publications` WHERE guid="' . $doi . '";' . "\n";
+
 			}
+		
+			echo "-- \n";
 		
 			$result->MoveNext();
 		}
