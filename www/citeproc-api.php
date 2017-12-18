@@ -7,6 +7,100 @@ require_once(dirname(dirname(__FILE__)) . '/adodb5/adodb.inc.php');
 require_once(dirname(dirname(__FILE__)) . '/lib.php');
 require_once(dirname(dirname(__FILE__)) . '/reference.php');
 
+function fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time($str)
+{
+    return preg_replace_callback('#[\\xA1-\\xFF](?![\\x80-\\xBF]{2,})#', 'utf8_encode_callback', $str);
+}
+
+function utf8_encode_callback($m)
+{
+    return utf8_encode($m[0]);
+}
+
+//----------------------------------------------------------------------------------------
+// JSTOR thumbnail
+function get_jstor_thumbnail(&$reference, $jstor)
+{
+	$thumbnail_dir = dirname(dirname(dirname(dirname(__FILE__)))) . '/Development/jstor-thumbnails-o';
+	
+	// GIF
+	$filename = $thumbnail_dir . '/' . $jstor . '.gif';
+	
+	// if no GIF try JPEG
+	if (!file_exists($filename))
+	{
+		$filename = $thumbnail_dir . '/' . $jstor . '.jpg';
+	}
+
+	if (!file_exists($filename))
+	{
+		$filename = $thumbnail_dir . '/' . $jstor . '.jpeg';
+	}
+			
+	if (file_exists($filename))
+	{		
+		$image_type = exif_imagetype($filename);
+		switch ($image_type)
+		{
+			case IMAGETYPE_GIF:
+				$mime_type = 'image/gif';
+				break;
+			case IMAGETYPE_JPEG:
+				$mime_type = 'image/jpg';
+				break;
+			case IMAGETYPE_PNG:
+				$mime_type = 'image/png';
+				break;
+			case IMAGETYPE_TIFF_II:
+			case IMAGETYPE_TIFF_MM:
+				$mime_type = 'image/tif';
+				break;
+			default:
+				$mime_type = 'image/gif';
+				break;
+		}
+		
+		$image = file_get_contents($filename);
+		$base64 = chunk_split(base64_encode($image));
+		$reference->thumbnail = 'data:' . $mime_type . ';base64,' . $base64;				
+	}
+}
+
+//----------------------------------------------------------------------------------------
+// PDF thumbnail 
+function get_pdf_thumbnail(&$reference, $pdf)
+{
+	
+	$url = 'http://direct.bionames.org/bionames-archive/pdfstore?url=' . urlencode($pdf) . '&noredirect&format=json';
+	$json = get($url);
+	
+	//echo $url;
+	
+	$obj = json_decode($json);
+	
+	//print_r($obj);
+	
+	if ($obj->http_code == 200)
+	{		
+		$url = 'http://direct.bionames.org/bionames-archive/documentcloud/pages/' . $obj->sha1 . '/1-small';
+//		$url = 'http://bionames.org/bionames-archive/documentcloud/pages/a5228371107ec0685cbe82f863c01dc097f3af94/1-small';
+		//$url = 'http://direct.bionames.org/bionames-archive/pdf/34/bc/89/34bc89cd65c9e80a4d5f9bc8b9c6c97ce2e02287/images/thumbnails/page-0.png';
+
+		//$url = 'http://direct.bionames.org/bionames-archive/pdf/44/90/63/449063c9652780cd06a1b0a2f5dee76f775521a9/images/thumbnails/page-0.png';
+		//echo $url;
+		//exit();
+		$image = get($url);
+		
+		if ($image != '')
+		{				
+			$mime_type = 'image/png';
+			$base64 = chunk_split(base64_encode($image));
+			$reference->thumbnail = 'data:' . $mime_type . ';base64,' . $base64;		
+		}	
+		//print_r($reference);exit();	
+	}
+}
+
 
 $guid = 'http://www.jstor.org/stable/3668632';
 $guid = '10.3767/000651906x622210';
@@ -27,7 +121,10 @@ $db->Connect("localhost",
 // Ensure fields are (only) indexed by column name
 $ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
 
+//$db->EXECUTE("set publications 'utf8'"); 
 $db->EXECUTE("set names 'utf8'"); 
+
+
 
 //--------------------------------------------------------------------------------------------------
 
@@ -62,57 +159,68 @@ if ($result->NumRows() == 1)
 {
 
 	//print_r($result);
+	
+	$thumbnail_url = '';
 
 	$reference = new stdclass;
 	
 	$reference->guid = $result->fields['guid'];
 	
-	$reference->type == 'article';
+	$reference->type = 'article';
+	
+	if ($result->fields['type'] == 'book')
+	{
+		$reference->type = 'book';
+	}
+	
 	$reference->title = $result->fields['title'];
 	$reference->title = strip_tags($reference->title);
 	
-	$reference->journal = new stdclass;
-	$reference->journal->name = $result->fields['journal'];
+	if ($reference->type == 'article')
+	{
 	
-	if ($result->fields['series'] != '')
-	{
-		$reference->journal->series = $result->fields['series'];
-	}
+		$reference->journal = new stdclass;
+		$reference->journal->name = $result->fields['journal'];
 	
-	if ($result->fields['volume'] != '')
-	{
-		$reference->journal->volume = $result->fields['volume'];
-	}
-	if ($result->fields['issue'] != '')
-	{
-		$reference->journal->issue = $result->fields['issue'];
-	}
-	if ($result->fields['spage'] != '')
-	{
-		$reference->journal->pages = $result->fields['spage'];
-	}
-	if ($result->fields['epage'] != '')
-	{
-		$reference->journal->pages .= '--' . $result->fields['epage'];
-	}
+		if ($result->fields['series'] != '')
+		{
+			$reference->journal->series = $result->fields['series'];
+		}
+	
+		if ($result->fields['volume'] != '')
+		{
+			$reference->journal->volume = $result->fields['volume'];
+		}
+		if ($result->fields['issue'] != '')
+		{
+			$reference->journal->issue = $result->fields['issue'];
+		}
+		if ($result->fields['spage'] != '')
+		{
+			$reference->journal->pages = $result->fields['spage'];
+		}
+		if ($result->fields['epage'] != '')
+		{
+			$reference->journal->pages .= '--' . $result->fields['epage'];
+		}
 
-	if ($result->fields['issn'] != '')
-	{
-		$identifier = new stdclass;
-		$identifier->type = 'issn';
-		$identifier->id = $result->fields['issn'];
+		if ($result->fields['issn'] != '')
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'issn';
+			$identifier->id = $result->fields['issn'];
 		
-		$reference->journal->identifier[] = $identifier;
-	}
-	if ($result->fields['eissn'] != '')
-	{
-		$identifier = new stdclass;
-		$identifier->type = 'issn';
-		$identifier->id = $result->fields['eissn'];
+			$reference->journal->identifier[] = $identifier;
+		}
+		if ($result->fields['eissn'] != '')
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'issn';
+			$identifier->id = $result->fields['eissn'];
 
-		$reference->journal->identifier[] = $identifier;
-	}
-	
+			$reference->journal->identifier[] = $identifier;
+		}
+	}	
 	
 	
 	// Date to do: handle dates not just year
@@ -178,6 +286,22 @@ if ($result->NumRows() == 1)
 		$reference->identifier[] = $identifier;
 	}
 	
+	if ($result->fields['isbn10'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'isbn';
+		$identifier->id = $result->fields['isbn10'];
+		$reference->identifier[] = $identifier;
+	}
+
+	if ($result->fields['isbn13'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'isbn';
+		$identifier->id = $result->fields['isbn13'];
+		$reference->identifier[] = $identifier;
+	}
+	
 	if ($result->fields['pmid'] != '')
 	{
 		$identifier = new stdclass;
@@ -200,6 +324,38 @@ if ($result->NumRows() == 1)
 		$identifier->id = $result->fields['jstor'];
 		$reference->identifier[] = $identifier;
 	}
+	
+	
+	
+	// zootaxa
+	if ($result->fields['zootaxa_url'] != '')
+	{
+		$link = new stdclass;
+		$link->anchor = 'LINK';
+		$link->url = $result->fields['zootaxa_url'];
+		$reference->link[] = $link;
+		
+		if ($thumbnail_url == '')
+		{
+			$thumbnail_url = $link->url;
+		}
+	}	
+	if ($result->fields['zootaxa_pdf_url'] != '')
+	{
+		$link = new stdclass;
+		$link->anchor = 'PDF';
+		$link->url = $result->fields['zootaxa_pdf_url'];
+		$reference->link[] = $link;
+		
+		if ($thumbnail_url == '')
+		{
+			$thumbnail_url = $link->url;
+		}
+		
+	}	
+	
+	
+	
 	if ($result->fields['url'] != '')
 	{
 		$link = new stdclass;
@@ -213,6 +369,12 @@ if ($result->NumRows() == 1)
 		$link->anchor = 'PDF';
 		$link->url = $result->fields['pdf'];
 		$reference->link[] = $link;
+		
+		if ($thumbnail_url == '')
+		{
+			$thumbnail_url = $link->url;
+		}
+		
 	}	
 
 	if ($result->fields['xml'] != '')
@@ -239,22 +401,15 @@ if ($result->NumRows() == 1)
 		$reference->identifier[] = $identifier;
 	}
 	
-	
-	// zootaxa
-	if ($result->fields['zootaxa_url'] != '')
+
+	if ($result->fields['publisher'] != '')
 	{
-		$link = new stdclass;
-		$link->anchor = 'LINK';
-		$link->url = $result->fields['zootaxa_url'];
-		$reference->link[] = $link;
-	}	
-	if ($result->fields['zootaxa_pdf_url'] != '')
+		$reference->publisher = $result->fields['publisher'];
+	}
+	if ($result->fields['publoc'] != '')
 	{
-		$link = new stdclass;
-		$link->anchor = 'PDF';
-		$link->url = $result->fields['zootaxa_pdf_url'];
-		$reference->link[] = $link;
-	}	
+		$reference->publoc = $result->fields['publoc'];
+	}
 	
 	
 	
@@ -263,6 +418,21 @@ if ($result->NumRows() == 1)
 	{
 		$reference->abstract = trim($result->fields['abstract']);
 	}
+	
+	// thumbnails
+	if ($thumbnail_url != '')
+	{
+		//echo $thumbnail_url . '<br/>';
+		get_pdf_thumbnail($reference, $thumbnail_url);
+	}
+		
+
+	if ($result->fields['jstor'] != '')
+	{
+		get_jstor_thumbnail($reference, $result->fields['jstor']);
+	}
+		
+	
 
 	// multilingual data
 	
@@ -275,6 +445,8 @@ if ($result->NumRows() == 1)
 		$key = $result->fields['key'];
 		$language = $result->fields['language'];
 		$value = $result->fields['value'];
+		
+		//echo $value . '<br/>';
 	
 		switch ($key)
 		{
@@ -338,7 +510,27 @@ if ($result->NumRows() == 1)
 					{
 						$reference->author[$i]->multi->_key->literal  = new stdclass;
 					}
-					$reference->author[$i]->multi->_key->literal->{$language} = $authors[$i];								
+					
+					// sanity check, there may be cases where names are not in the 
+					// correct language (e.g., English names in CiNii)
+					
+					$ok = true;
+					
+					if ($language == 'ja')
+					{
+						$ok = preg_match('/\p{Han}+/u', $authors[$i]);
+					}
+					/*
+					if ($language == 'zh')
+					{
+						$ok = preg_match('/\p{Han}+/u', $authors[$i]);
+					}
+					*/
+					
+					if ($ok)
+					{
+						$reference->author[$i]->multi->_key->literal->{$language} = $authors[$i];								
+					}
 				}
 				break;
 				
@@ -346,6 +538,10 @@ if ($result->NumRows() == 1)
 			default:
 				break;
 		}
+		
+		
+		
+		
 				
 		$result->MoveNext();
 	}	
@@ -379,76 +575,82 @@ if ($result->NumRows() == 1)
 		echo '</pre>';
 	}
 	
-	$link_index = -1;
-	
-	if (isset($c['link']))
+	// Add PDF images, etc.
+	if (1)
 	{
-		$n = count($c['link']);
-		for ($i = 0; $i < $n; $i++)
+	
+		$link_index = -1;
+	
+		if (isset($c['link']))
 		{
-			if ($c['link'][$i]->{'content-type'} == 'application/pdf')
+			$n = count($c['link']);
+			for ($i = 0; $i < $n; $i++)
 			{
-				$link_index = $i;
+				if ($c['link'][$i]->{'content-type'} == 'application/pdf')
+				{
+					$link_index = $i;
+				}
 			}
 		}
-	}
 		
 	
 	
-	if ($link_index > -1)
-	{
-		$pdf = $c['link'][$link_index]->URL;
-		$sql = 'SELECT * FROM sha1 WHERE pdf="' . addcslashes($pdf, '"') . '" LIMIT 1';
-		
-		// echo $sql;
-		$result = $db->Execute($sql);
-		if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
-	
-		if ($result->NumRows() == 1) 
+		if ($link_index > -1)
 		{
-			$sha1 = $result->fields['sha1'];
-			
-			$c['link'][$link_index]->sha1 = $sha1;
-			
-			// get details
-			$json = get('http://bionames.org/bionames-archive/documentcloud/' . $sha1 . '.json');
-			if ($json)
+			$pdf = $c['link'][$link_index]->URL;
+			$sql = 'SELECT * FROM sha1 WHERE pdf="' . addcslashes($pdf, '"') . '" LIMIT 1';
+		
+			// echo $sql;
+			$result = $db->Execute($sql);
+			if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
+	
+			if ($result->NumRows() == 1) 
 			{
-				$obj = json_decode($json);
+				$sha1 = $result->fields['sha1'];
+			
+				$c['link'][$link_index]->sha1 = $sha1;
+			
+				// get details
+				$json = get('http://bionames.org/bionames-archive/documentcloud/' . $sha1 . '.json');
+				if ($json)
+				{
+					$obj = json_decode($json);
 				
-				$c['pdf_pages'] = array();
-				for ($i = 1; $i <= $obj->pages; $i++)
-				{
-					$c['pdf_pages'][$i] = 'http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i . '-small';
-				}	
-
-				$c['text_pages'] = array();
-				for ($i = 1; $i <= $obj->pages; $i++)
-				{
-					$text = get('http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i);
-					if ($text != '')
+					$c['page-images'] = array();
+					$c['page-thumbnails'] = array();
+					for ($i = 1; $i <= $obj->pages; $i++)
 					{
-						$c['text_pages'][] = json_decode($text);
+						$c['page-images'][$i] = 'http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i . '-large';
+						$c['page-thumbnails'][$i] = 'http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i . '-small';
+					}	
+
+					$c['page-text'] = array();
+					for ($i = 1; $i <= $obj->pages; $i++)
+					{
+						$text = get('http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i);
+						if ($text != '')
+						{
+							$c['page-text'][] = json_decode($text);
+						}
+					}	
+					if (count($c['text_pages']) == 0)
+					{
+						unset($c['text_pages']);
 					}
-				}	
-				if (count($c['text_pages']) == 0)
-				{
-					unset($c['text_pages']);
-				}
 				
 				
 							
-			}
+				}
 						
-			// OCR text?
+				// OCR text?
 			
 			
-		}
+			}
 		
 	
 	
-	}
-	
+		}
+	}	
 	
 	
 	echo json_encode($c);
