@@ -158,6 +158,8 @@ if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
 if ($result->NumRows() == 1)
 {
 
+	$issn = ''; // use this as a flag for some post processing
+	
 	//print_r($result);
 	
 	$thumbnail_url = '';
@@ -209,6 +211,8 @@ if ($result->NumRows() == 1)
 			$identifier = new stdclass;
 			$identifier->type = 'issn';
 			$identifier->id = $result->fields['issn'];
+			
+			$issn = $result->fields['issn'];
 		
 			$reference->journal->identifier[] = $identifier;
 		}
@@ -238,31 +242,47 @@ if ($result->NumRows() == 1)
 	// authors
 	if ($result->fields['authors'] != '')
 	{
-		$authors = explode(";", trim($result->fields['authors']));
+		$delimiter = ';';
+		
+		if ($issn == '1000-470X')
+		{
+			$delimiter = ',';
+		}
+	
+	
+		$authors = explode($delimiter, trim($result->fields['authors']));
 		
 		foreach ($authors as $a)
 		{
 			if ($a != '')
 			{
 				$author = new stdclass;
-			
-				$parts = explode(",", $a);
-				if (count($parts) == 2)
+				
+				
+				if (preg_match('/\p{Han}+/u', $a))
 				{
-					$author->lastname = trim($parts[0]);
-					$author->firstname = trim($parts[1]);
+					$author->name = trim($a);
 				}
 				else
 				{
-					$parts = explode(" ", $a);
-					$n = count($parts);
-					if ($n > 1)
+					$parts = explode(",", $a);
+					if (count($parts) == 2)
 					{
-						$author->lastname = array_pop($parts);
-						$author->firstname = join(' ', $parts);
-					}			
+						$author->lastname = trim($parts[0]);
+						$author->firstname = trim($parts[1]);
+					}
+					else
+					{
+						$parts = explode(" ", $a);
+						$n = count($parts);
+						if ($n > 1)
+						{
+							$author->lastname = array_pop($parts);
+							$author->firstname = join(' ', $parts);
+						}			
+					}
+					$author->name = $a;
 				}
-				$author->name = $a;
 			
 				$reference->author[] = $author;
 			}
@@ -270,6 +290,15 @@ if ($result->NumRows() == 1)
 	}	
 	
 	// identifiers and links
+	
+	if ($result->fields['cinii'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'cinii';
+		$identifier->id = $result->fields['cinii'];
+		$reference->identifier[] = $identifier;
+	}
+	
 	
 	if ($result->fields['doi'] != '')
 	{
@@ -481,7 +510,15 @@ if ($result->NumRows() == 1)
 				
 			case 'authors':
 				// big assumption, we've parsed author names OK
-				$authors = explode(";", trim($value));
+				
+				$delimiter = ';';
+				
+				if ($issn == '1000-470X')
+				{
+					$delimiter = ',';
+				}
+				
+				$authors = explode($delimiter, trim($value));
 				
 				
 				
