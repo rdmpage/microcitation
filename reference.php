@@ -267,6 +267,11 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 		{
 			switch ($identifier->type)
 			{
+				case 'cinii':
+					$citeproc_obj['CINII'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'CINII:' . $identifier->id;
+					break;
+			
 				case 'doi':
 					$citeproc_obj['DOI'] = $identifier->id;
 					$citeproc_obj['alternative-id'][] = 'DOI:' . $identifier->id;
