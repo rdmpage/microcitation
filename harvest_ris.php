@@ -252,6 +252,11 @@ function ris_import($reference)
 			$keys[] = 'oai';
 			$values[] = '"' . addcslashes($reference->publisher_id, '"') . '"';	
 		}
+		
+		if ($guid == '')
+		{
+			$guid = $reference->publisher_id;
+		}
 	}
 	
 	
@@ -283,11 +288,12 @@ function ris_import($reference)
 		echo $sql . "\n";
 	}
 	
-	// Import JSTOR prior to a given date
+	// Import prior to a given date
 	if (0) 
 	{
 		// && in_array($reference->year, array(2005,2006,2007)))
-		if (isset($reference->year)  && ($reference->year < 2002))
+		if (isset($reference->year)  && ($reference->year < 2014))
+		//if (isset($reference->journal->volume)  && ($reference->journal->volume < 47))
 		{
 			$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
 				. join(',', $values) . ');';
@@ -312,6 +318,7 @@ function ris_import($reference)
 	
 	// Add data to existing record
 	if (0) 
+//	if (in_array($reference->year, array(2014,2015,2016,2017)))
 	{
 		
 			$qualifiers = array();
@@ -376,7 +383,7 @@ function ris_import($reference)
 	// Add JSTOR to existing record
 	if (0) 
 	{
-		if (isset($reference->year) && ($reference->year >= 2002))
+		if (isset($reference->year) && ($reference->year >= 2000))
 		{
 		
 			$qualifiers = array();
@@ -406,11 +413,11 @@ function ris_import($reference)
 			
 			if (count($qualifiers) == 3)
 			{
-				//$sql = 'UPDATE publications SET jstor=' . str_replace('http://www.jstor.org/stable/', '', $guid)
-				//	. ' WHERE ' . join(" AND ", $qualifiers) . ';';
-				$sql = 'UPDATE publications SET jstor=' . str_replace('10.2307/', '', $guid)
+				$sql = 'UPDATE publications SET jstor=' . str_replace('http://www.jstor.org/stable/', '', $guid)
 					. ' WHERE ' . join(" AND ", $qualifiers) . ';';
-
+/*				$sql = 'UPDATE publications SET jstor=' . str_replace('10.2307/', '', $guid)
+					. ' WHERE ' . join(" AND ", $qualifiers) . ';';
+*/
 				echo $sql . "\n";
 			}
 		}
