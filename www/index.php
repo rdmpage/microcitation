@@ -237,7 +237,7 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 	
 	// hack for multiple records
 	//$sql .= ' AND url LIKE "http://www.repository.naturalis.nl/%"';
-	$sql .= ' AND doi IS NOT NULL';
+	//$sql .= ' AND doi IS NOT NULL';
 	
 	$obj->sql = $sql;
 
