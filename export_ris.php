@@ -170,22 +170,39 @@ $issn ='0034-740X';
 $issn ='0312-3162';
 $issn ='1684-4130';
 $issn ='1815-8242';
+$issn ='0077-1813';
+$issn ='0811-3653';
+$issn ='0077-1813';
+$issn ='0187-7151';
+
+$issn ='0379-0207';
+
+$issn ='0311-9548';
+$issn ='1447-2546'; // Memoirs of Museum Victoria
+//$issn ='0814-1827'; // Memoirs of the Museum of Victoria
+//$issn ='0083-5986';
+//$issn ='0187-7151';
+
+$issn = '0312-3162';
+$issn = '0187-7151';
+//$issn = '2304-7534';
 
 $sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
 
 //$sql = 'SELECT * FROM publications WHERE journal="Malakozoologische Blätter"';
 
 
-//$sql .= ' AND year = 1949';
+//$sql .= ' AND year = 2001';
+//$sql .= ' AND year IN (2002, 2003)';
 //$sql .= ' AND volume = 23 AND ISSUE IS NOT NULL';
 
 //$sql .= ' AND year < 1901 and volume <> 0 AND spage is not null';
 
-// $sql .= ' AND volume = 18';
+$sql .= ' AND volume IN(64,65,67,68)';
 
 //$sql = 'SELECT * FROM publications where journal like "Studies and%"';
 
-//$sql .= ' AND year = 2014';
+//$sql .= ' AND year = 2003';
 //$sql .= ' and spage <> 0';
 
 //$sql .= ' AND doi IS NULL and year > 2011';

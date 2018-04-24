@@ -25,12 +25,12 @@ function get_meta($doi, &$keys, &$values)
 
 			$metas = $dom->find('meta');
 
-			/*
+			
 			foreach ($metas as $meta)
 			{
-				echo $meta->name . " " . $meta->content . "\n";
+				//echo $meta->name . " " . $meta->content . "\n";
 			}
-			*/
+			
 
 			foreach ($metas as $meta)
 			{
@@ -62,7 +62,7 @@ function get_meta($doi, &$keys, &$values)
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
 						break;
 					*/
-												
+					/*					
 					case 'citation_abstract_html_url':
 						$keys[] = 'url';
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
@@ -73,7 +73,7 @@ function get_meta($doi, &$keys, &$values)
 						$keys[] = 'pdf';
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
 						break;
-						
+					*/	
 					
 					default:
 						break;
@@ -796,8 +796,30 @@ $issn = '2327-2929';
 $issn = '0960-4286';
 $issn = '0960-4286';
 $issn = '0181-1584';
+$issn = '0022-8567';
+$issn = '1217-8837';
 
-for ($y = 1999; $y <= 2001; $y++)
+$issn = '1851-8044';
+$issn = '0010-065X';
+$issn = '0311-9548';
+$issn = '1447-2546';
+$issn = '0814-1827';
+$issn = '0083-5986';
+$issn = '0022-3360';
+$issn = '0187-7151';
+
+$issn = '1447-2546';
+$issn = '0814-1827';
+$issn = '0083-5986';
+
+$issn ='0373-9465';
+
+$issn ='0749-8004';
+$issn ='0187-7151';
+
+$issn ='0265-086X';
+
+for ($y = 1983; $y <= 2018; $y++)
 {
 	$count = 0;
 	$page = '';
@@ -931,7 +953,11 @@ for ($y = 1999; $y <= 2001; $y++)
 					case '1808-2688':
 					case '0024-2829':
 					case '0044-5967':
+					case '0187-7151':
 						get_meta($doi, $keys, $values);
+						
+						//print_r($keys);
+						
 						$enhance = false;
 						break;
 			
