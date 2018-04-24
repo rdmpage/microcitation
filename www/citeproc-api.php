@@ -405,6 +405,39 @@ if ($result->NumRows() == 1)
 		}
 		
 	}	
+	
+	
+	// Zenodo, may be DOI or URL
+	if ($result->fields['zenodo'] != '')
+	{
+		$zenodo = $result->fields['zenodo'];
+		if (preg_match('/^10.5281\/zenodo/', $zenodo))
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'doi';
+			$identifier->id = $zenodo;
+			$reference->identifier[] = $identifier;
+			
+			$zenodo = str_replace('10.5281/zenodo.', 'https://zenodo.org/record/', $zenodo);
+		}
+
+		$link = new stdclass;
+		$link->anchor = 'LINK';
+		$link->url = $zenodo;
+		$reference->link[] = $link;		
+		
+		$zenodo = str_replace('https://zenodo.org/record/', '', $zenodo);
+		
+		$identifier = new stdclass;
+		$identifier->type = 'zenodo';
+		$identifier->id = $zenodo;
+		$reference->identifier[] = $identifier;
+	
+	
+	}
+	
+	
+	
 
 	if ($result->fields['xml'] != '')
 	{

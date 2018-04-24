@@ -313,6 +313,9 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 					$citeproc_obj['alternative-id'][] = $identifier->id;
 					break;
 					
+				case 'zenodo':
+					$citeproc_obj['ZENODO'] = $identifier->id;
+					break;
 					
 				default:
 					break;
