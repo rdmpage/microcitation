@@ -8,6 +8,8 @@ cookie.txt
 #svn
 .svn*
 
+backups
+
 junk
 
 www/.DS_Store

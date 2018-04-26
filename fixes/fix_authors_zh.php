@@ -73,6 +73,10 @@ $sql = 'SELECT * FROM multilingual WHERE guid="10.3969/j.issn.1003-4692.1999.05.
 
 $sql = 'SELECT * FROM multilingual WHERE guid LIKE "10.3969/j.issn.1003-4692%" AND `key`="authors"';
 
+$sql = 'SELECT * FROM multilingual WHERE guid LIKE "10.3969/j.issn.1000-1565%" AND `key`="authors"';
+
+
+
 //echo $sql . "\n";
 
 $result = $db->Execute($sql);
