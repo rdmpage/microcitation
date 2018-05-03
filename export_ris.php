@@ -187,6 +187,8 @@ $issn = '0312-3162';
 $issn = '0187-7151';
 //$issn = '2304-7534';
 
+$issn = '0031-1820';
+
 $sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
 
 //$sql = 'SELECT * FROM publications WHERE journal="Malakozoologische Blätter"';
@@ -198,7 +200,7 @@ $sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
 
 //$sql .= ' AND year < 1901 and volume <> 0 AND spage is not null';
 
-$sql .= ' AND volume IN(64,65,67,68)';
+// $sql .= ' AND volume IN(64,65,67,68)';
 
 //$sql = 'SELECT * FROM publications where journal like "Studies and%"';
 
