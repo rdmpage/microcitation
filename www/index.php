@@ -10,7 +10,7 @@ require_once(dirname(__FILE__) . '/fingerprint.php');
 //require_once(dirname(__FILE__) . '/lcs.php');
 
 //----------------------------------------------------------------------------------------
-$db = NewADOConnection('mysql');
+$db = NewADOConnection('mysqli');
 $db->Connect("localhost", 
 	$config['db_user'] , $config['db_passwd'] , $config['db_name']);
 

@@ -286,6 +286,8 @@ function process_ris_key($key, $value, &$obj)
 		case 'Y1':
 		   $date = $value; 
 		   
+		   //echo $value . "\n";
+		   
 		   // PY  - 2002-02-01T00:00:00///
 		   if (preg_match("/(?<year>[0-9]{4})-(?<month>[0-9]{1,2})-(?<day>[0-9]{1,2})/", $date, $matches))
 		   {                       
@@ -331,6 +333,12 @@ function process_ris_key($key, $value, &$obj)
 		   		$obj->year = $matches['year'];
 				$obj->date = $date;
 		   }
+		   
+		   if (!isset($obj->year))
+		   {
+		   		$obj->year = $value;
+		   }
+		   
 		   break;
 		   
 		case 'KW':

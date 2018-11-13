@@ -114,7 +114,7 @@ if (isset($_GET['guid']))
 
 
 //--------------------------------------------------------------------------------------------------
-$db = NewADOConnection('mysql');
+$db = NewADOConnection('mysqli');
 $db->Connect("localhost", 
 	$config['db_user'] , $config['db_passwd'] , $config['db_name']);
 
@@ -493,8 +493,11 @@ if ($result->NumRows() == 1)
 	{
 		get_jstor_thumbnail($reference, $result->fields['jstor']);
 	}
-		
-	
+
+	if ($result->fields['thumbnailUrl'] != '')
+	{
+		$reference->thumbnailUrl = $result->fields['thumbnailUrl'];
+	}
 
 	// multilingual data
 	
@@ -646,7 +649,7 @@ if ($result->NumRows() == 1)
 	}
 	
 	// Add PDF images, etc.
-	if (1)
+	if (0)
 	{
 	
 		$link_index = -1;

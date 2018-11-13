@@ -184,27 +184,52 @@ $issn ='1447-2546'; // Memoirs of Museum Victoria
 //$issn ='0187-7151';
 
 $issn = '0312-3162';
-$issn = '0187-7151';
+$issn = '0187-7151'; // Acta Botánica Mexicana
 //$issn = '2304-7534';
 
-$issn = '0031-1820';
+//$issn = '1280-9659';
+
+$issn ='1833-0290';
+
+$issn = '0067-1975';
+$issn = '0374-7859';
+$issn = '0863-1867';
+$issn = '0187-7151';
 
 $sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
 
+
+$sql = 'SELECT * FROM publications WHERE doi="10.1636/0161-8202(2002)030[0219:tansgf]2.0.co;2"';
+$sql = 'SELECT * FROM publications WHERE pdf="http://zoolstud.sinica.edu.tw/Journals/46.4/454.pdf"';
+$sql = 'SELECT * FROM publications WHERE pdf="http://lkcnhm.nus.edu.sg/nus/pdf/PUBLICATION/Raffles%20Bulletin%20of%20Zoology/Past%20Volumes/RBZ%2056(2)/56rbz357-384.pdf"';
+$sql = 'SELECT * FROM publications WHERE guid="http://www.zobodat.at/publikation_articles.php?id=237741"';
+
+$sql = 'SELECT * FROM publications WHERE doi="10.24199/j.mmv.2014.72.07"';
+
+$sql = 'SELECT * FROM publications WHERE doi="10.1206/3748.2"';
+
+$sql = 'SELECT * FROM publications WHERE doi="10.3853/j.2201-4349.67.2015.1646"';
+
 //$sql = 'SELECT * FROM publications WHERE journal="Malakozoologische Blätter"';
 
+$sql = 'SELECT * FROM publications WHERE journal ="The Raffles Bulletin of Zoology"';
 
-//$sql .= ' AND year = 2001';
-//$sql .= ' AND year IN (2002, 2003)';
+//$sql = 'SELECT * FROM publications WHERE journal ="Acta Societatis Zoologicae Bohemicae"';
+//$sql .= ' AND year = 2005';
+
+//$sql .= ' AND year = 2016';
+//$sql .= ' AND year IN (2004, 2005, 2006)';
 //$sql .= ' AND volume = 23 AND ISSUE IS NOT NULL';
 
 //$sql .= ' AND year < 1901 and volume <> 0 AND spage is not null';
 
-// $sql .= ' AND volume IN(64,65,67,68)';
+$sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
+
+//$sql .= ' AND volume IN(1,2)';
 
 //$sql = 'SELECT * FROM publications where journal like "Studies and%"';
 
-//$sql .= ' AND year = 2003';
+$sql .= ' AND year >= 2017';
 //$sql .= ' and spage <> 0';
 
 //$sql .= ' AND doi IS NULL and year > 2011';

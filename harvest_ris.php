@@ -39,6 +39,12 @@ function ris_import($reference)
 			$reference->journal->series = $m['series'];
 		}
 	}
+	
+	// handle some messy journal names
+	if ($journal == 'Berichte Der Schweizerischen Botanischen Gesellschaft = Bulletin de la Société Botanique Suisse')
+	{
+		$journal = 'Berichte Der Schweizerischen Botanischen Gesellschaft';
+	}
 		
 	$keys[] = 'journal';
 	$values[] = '"' . addcslashes($journal, '"') . '"';
@@ -270,8 +276,18 @@ function ris_import($reference)
 	{
 		$guid = $issn . '-' . basename($guid);
 	}
+
+	// Geodiversitas has obscenely long URLs
+	if (($issn == '1280-9659') && (strlen($guid) >= 255))
+	{
+		$guid = md5(join('', $values));
+	}
 	
-	
+	// Zoosystema has obscenely long URLs	
+	if (($issn == '1280-9551') && (strlen($guid) >= 255))
+	{
+		$guid = md5(join('', $values));
+	}
 	
 	
 	$keys[] = 'guid';
@@ -281,18 +297,55 @@ function ris_import($reference)
 	
 	// populate from scratch (default)
 	if (1)
-	//if (in_array($reference->journal->volume, array(6,7,8,9,10,11))) 
 	{
 		$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
 			. join(',', $values) . ');';
 		echo $sql . "\n";
 	}
 	
+	// Only add articles from a given journal
+	// 
+	if (0)
+	{
+		$issn = '0366-3094'; // Berichte der Schweizerischen Botanischen Gesellschaft
+		$issn = '0253-1453'; // Botanica Helvetica
+		
+		$add = false;
+		if (isset($reference->journal) && isset($reference->journal->identifier))
+		{
+			foreach ($reference->journal->identifier as $identifier)
+			{
+				switch ($identifier->type)
+				{
+					case 'issn':
+						if ($identifier->id == $issn)
+						{
+							$add = true;
+						}
+						break;
+						
+					default:
+						break;
+				}
+			}
+		}
+		
+		if ($add)
+		{
+			$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
+				. join(',', $values) . ');';
+			echo $sql . "\n";		
+		}
+	}
+		
 	// Import prior to a given date
 	if (0) 
 	{
 		// && in_array($reference->year, array(2005,2006,2007)))
-		if (isset($reference->year)  && ($reference->year < 2014))
+		if (isset($reference->year)  && ($reference->year < 2002))
+		
+//		if (isset($reference->year)  && in_array($reference->year, array(2005)))
+		
 		//if (isset($reference->journal->volume)  && ($reference->journal->volume < 47))
 		{
 			$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
@@ -318,7 +371,7 @@ function ris_import($reference)
 	
 	// Add data to existing record
 	if (0) 
-//	if (in_array($reference->year, array(2014,2015,2016,2017)))
+	//if ($reference->year > 2001) 
 	{
 		
 			$qualifiers = array();
@@ -345,9 +398,31 @@ function ris_import($reference)
 			}
 			
 			//print_r($qualifiers);
+			//print_r($reference);
 			
 			if (count($qualifiers) == 3)
 			{
+			
+				if (isset($reference->identifier))
+				{
+					foreach ($reference->identifier as $identifier)
+					{
+						switch($identifier->type)
+						{
+							case 'handle':
+								$sql = 'UPDATE publications SET handle="' . $identifier->id . '"'
+								. ' WHERE ' . join(" AND ", $qualifiers) . ' AND handle IS NULL;';
+								
+								echo $sql . "\n";
+								break;
+						
+							default:
+								break;
+						}
+					}
+				}
+			
+				
 				if (isset($reference->link))
 				{
 					foreach ($reference->link as $link)
@@ -367,7 +442,7 @@ function ris_import($reference)
 							$pdf = $link->url ;
 
 							$sql = 'UPDATE publications SET pdf="' . $link->url . '"'
-								. ' WHERE ' . join(" AND ", $qualifiers) . ' AND doi IS NOT NULL;';
+								. ' WHERE ' . join(" AND ", $qualifiers) . ';'; // ' AND doi IS NOT NULL;';
 
 							echo $sql . "\n";
 						}
@@ -383,8 +458,11 @@ function ris_import($reference)
 	// Add JSTOR to existing record
 	if (0) 
 	{
-		if (isset($reference->year) && ($reference->year >= 2000))
+		//if (isset($reference->year) && ($reference->year >= 2006))
+		if (1)
 		{
+		
+			$epage = '';
 		
 			$qualifiers = array();
 			
@@ -403,6 +481,14 @@ function ris_import($reference)
 						$qualifiers[] = 'spage=' . $values[$count];
 						break;
 						
+					case 'jstor':
+						$qualifiers[] = 'doi=' . '"10.2307/' . str_replace('"', '', $values[$count]) . '"';
+						break;
+
+					case 'epage':
+						$epage = $values[$count];
+						break;
+						
 					default:
 						break;
 				}
@@ -411,13 +497,32 @@ function ris_import($reference)
 			
 			//print_r($qualifiers);
 			
-			if (count($qualifiers) == 3)
+			//print_r($reference);
+			
+			if (count($qualifiers) == 4)
 			{
-				$sql = 'UPDATE publications SET jstor=' . str_replace('http://www.jstor.org/stable/', '', $guid)
+/*				$sql = 'UPDATE publications SET jstor=' . str_replace('http://www.jstor.org/stable/', '', $guid)
 					. ' WHERE ' . join(" AND ", $qualifiers) . ';';
-/*				$sql = 'UPDATE publications SET jstor=' . str_replace('10.2307/', '', $guid)
+					
+				if ($epage != '')
+				{
+					$sql .= "\n" . 'UPDATE publications SET epage=' . $epage 
+						. ' WHERE ' . join(" AND ", $qualifiers) . ';';
+				}
+			*/					
+					
+				$sql = 'UPDATE publications SET jstor=' .str_replace('http://www.jstor.org/stable/', '', $guid)
 					. ' WHERE ' . join(" AND ", $qualifiers) . ';';
-*/
+
+				
+				if ($epage != '')
+				{
+					$sql .= "\n" . 'UPDATE publications SET epage=' . $epage 
+						. ' WHERE ' . join(" AND ", $qualifiers) . ';';
+				}
+				
+
+
 				echo $sql . "\n";
 			}
 		}

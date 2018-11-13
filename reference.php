@@ -227,6 +227,17 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 		if (isset($reference->journal->pages))
 		{	
 			$citeproc_obj['page'] = str_replace('--', '-', $reference->journal->pages);
+			
+			if (preg_match('/^[a-z]?\d+$/', $reference->journal->pages, $m))
+			{
+				$citeproc_obj['page-first'] = $reference->journal->pages;
+			}
+
+			if (preg_match('/(?<spage>\d+)-(?<epage>\d+)/', $reference->journal->pages, $m))
+			{
+				$citeproc_obj['page-first'] = $m['spage'];
+			}
+			
 		}
 		
 		if (isset($reference->journal->identifier))
@@ -412,6 +423,11 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 	if (isset($reference->thumbnail))
 	{	
 		$citeproc_obj['thumbnail'] = $reference->thumbnail;
+	}
+
+	if (isset($reference->thumbnailUrl))
+	{	
+		$citeproc_obj['thumbnailUrl'] = $reference->thumbnailUrl;
 	}
 	
 	

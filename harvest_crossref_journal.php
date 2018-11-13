@@ -43,12 +43,12 @@ function get_meta($doi, &$keys, &$values)
 						break;		
 					*/	
 			
-					/*
+					
 					case 'citation_firstpage':
 						$keys[] = 'spage';
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
 						break;
-					*/
+					
 					
 					
 					case 'citation_lastpage':
@@ -823,7 +823,44 @@ $issn = '0031-1820';
 
 $issn = '1405-3322';
 
-for ($y = 2005; $y <= 2018; $y++)
+$issn = '0044-5967';
+
+$issn = '1280-9659';
+
+$issn = '0374-5481';
+
+$issn = '1833-0290';
+
+$issn = '1534-6188';
+
+$issn = '0003-0082';
+$issn = '0037-2870';
+$issn = '0003-0090';
+$issn = '0067-1975';
+$issn = '0007-4977';
+$issn = '0081-0282';
+$issn = '0079-8835';
+$issn = '1280-9551';
+$issn = '0018-0831';
+
+$issn = '0374-7859';
+$issn = '0301-2123';
+
+$issn = '0008-7475';
+$issn = '1097-993X';
+
+$issn = '0187-7151';
+
+$issn = '0006-9698';
+
+$issn = '1814-3326';
+
+$issn ='0096-6134';
+$issn ='0105-0761';
+
+
+//for ($y = 1890; $y <= 2018; $y++)
+for ($y = 2003; $y <= 2018; $y++)
 {
 	$count = 0;
 	$page = '';
@@ -959,6 +996,7 @@ for ($y = 2005; $y <= 2018; $y++)
 					case '0044-5967':
 					case '0187-7151':
 					case '0031-1820':
+					//case '0301-2123':
 						get_meta($doi, $keys, $values);
 						
 						//print_r($keys);
@@ -1101,10 +1139,29 @@ for ($y = 2005; $y <= 2018; $y++)
 					$authors = array();
 					foreach ($params['rft.au'] as $au)
 					{
-						$authors[] = $au;
+						//echo $au . "\n";
+						
+						switch ($au)
+						{
+							case 'Museums Victoria':
+							case 'La Trobe University':
+							case 'Science Division':
+							case 'Department of Environment and Conservation':
+							case 'Australian Museum':
+							case 'Centre for Microscopy and Microanalysis (CMM)':
+							case 'The University of Queensland':
+								break;
+								
+							default:
+								$authors[] = $au;
+								break;
+						}
+						
 					}
 					$values[] = "'" . addcslashes(join(";", $authors), "'") . "'";
 				}
+				
+				
 					
 			
 				$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') VALUES (' . join(',', $values) . ');';
