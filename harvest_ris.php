@@ -288,7 +288,24 @@ function ris_import($reference)
 	{
 		$guid = md5(join('', $values));
 	}
+
+	// Adansonia has obscenely long URLs	
+	if (($issn == '1280-8571') && (strlen($guid) >= 255))
+	{
+		$guid = md5(join('', $values));
+	}
 	
+	if (strlen($guid) >= 255)
+	{
+		$guid = md5(join('', $values));
+	}
+	
+	
+	// Force guid (e.g., journal ha sno guid, or same PDF for multiple papers such as short notes)
+	if (0)
+	{
+		$guid = md5(join('', $values));
+	}
 	
 	$keys[] = 'guid';
 	$values[] = '"' . $guid . '"';
@@ -342,7 +359,7 @@ function ris_import($reference)
 	if (0) 
 	{
 		// && in_array($reference->year, array(2005,2006,2007)))
-		if (isset($reference->year)  && ($reference->year < 2002))
+		if (isset($reference->year)  && ($reference->year < 2009))
 		
 //		if (isset($reference->year)  && in_array($reference->year, array(2005)))
 		
@@ -370,9 +387,10 @@ function ris_import($reference)
 	}
 	
 	// Add data to existing record
-	if (0) 
-	//if ($reference->year > 2001) 
+	if (0) 	
 	{
+		if ($reference->year > 2008) 
+		{
 		
 			$qualifiers = array();
 			
@@ -431,7 +449,7 @@ function ris_import($reference)
 						{
 							
 							$sql = 'UPDATE publications SET url="' . $link->url . '"'
-								. ' WHERE ' . join(" AND ", $qualifiers) . ' AND doi IS NOT NULL;';
+								. ' WHERE ' . join(" AND ", $qualifiers) . ';'; // ' AND doi IS NOT NULL;';
 
 							echo $sql . "\n";
 						}
@@ -451,6 +469,7 @@ function ris_import($reference)
 			
 			
 			}
+		}
 		
 	}
 	
