@@ -413,7 +413,12 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 		}
 	}
 	
-	$citeproc_obj['alternative-id'] = array_unique($citeproc_obj['alternative-id']);
+	if (isset($citeproc_obj['alternative-id']))
+	{
+		$citeproc_obj['alternative-id'] = array_unique($citeproc_obj['alternative-id']);
+	}
+
+
 	if (count($citeproc_obj['alternative-id']) == 0)
 	{
 		unset($citeproc_obj['alternative-id']);
