@@ -51,6 +51,8 @@ if (!preg_match('/^10\./', $guid))
 		if (preg_match('/^http:\/\//', $guid))
 		{
 			$sql .= ' OR url="' . $guid . '"';
+			
+			$sql .= ' OR pdf="' . $guid . '"';
 		}
 	}
 }
