@@ -113,7 +113,7 @@ function find_from_title ($title, $filters = null)
 		{
 			$hit->title = $result->fields['title'];
 		}
-	
+			
 		if (isset($result->fields['doi']))
 		{
 			$hit->doi = $result->fields['doi'];
@@ -253,6 +253,11 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 	while (!$result->EOF) 
 	{
 		$hit = new stdclass;
+		
+		if (isset($result->fields['wikidata']))
+		{
+			$hit->wikidata = $result->fields['wikidata'];
+		}		
 	
 		if (isset($result->fields['doi']))
 		{
