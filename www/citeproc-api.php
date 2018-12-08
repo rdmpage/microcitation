@@ -485,7 +485,10 @@ if ($result->NumRows() == 1)
 	if ($thumbnail_url != '')
 	{
 		//echo $thumbnail_url . '<br/>';
-		get_pdf_thumbnail($reference, $thumbnail_url);
+		if (0)
+		{
+			get_pdf_thumbnail($reference, $thumbnail_url);
+		}
 	}
 		
 
