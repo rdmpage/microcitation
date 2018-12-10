@@ -717,4 +717,456 @@ function reference_to_sici($reference)
 }
 
 
+//--------------------------------------------------------------------------------------------------
+function reference_to_rdf($reference)
+{
+	$triples = array();
+	
+	$sameAs = array();
+	
+	$guid = $reference->guid;
+	
+	if (preg_match('/^10./', $guid))
+	{
+		$guid = 'https://doi.org/' . $guid;
+		
+		$sameAs[] = $guid;
+	}
+	
+	$subject_id = $guid; // fix this
+
+	$s = '<' . $subject_id . '>';
+	
+	$type = 'ScholarlyArticle';
+	
+	if ($reference->type == 'book')
+	{
+		$type = 'Book';
+	}
+	
+	$triples[] = $s . ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/' . $type . '> .';
+	
+	
+	$have_title = false;
+	
+	if (isset($reference->multi))
+	{
+		if (isset($reference->multi->{'_key'}->title))
+		{
+			$have_title = true;
+			
+			foreach ($reference->multi->{'_key'}->title as $language => $value)
+			{
+				$triples[] = $s . ' <http://schema.org/name> ' . '"' . addcslashes($value, '"') . '"@' . $language . ' .';
+			}
+		}	
+	}
+	
+	if (!$have_title)
+	{
+		if (isset($reference->title))
+		{
+			$triples[] = $s . ' <http://schema.org/name> ' . '"' . addcslashes($reference->title, '"') . '" .';		
+		}
+	}
+	
+	if (isset($reference->author))
+	{
+	
+		$n = count($reference->author);
+		for ($i = 0; $i < $n; $i++)
+		{
+			$index = $i + 1;
+		
+			// Author
+			$author_id = '<' . $subject_id . '#creator/' . $index . '>';
+			
+			if (isset($reference->author[$i]->multi))
+			{
+				if (isset($reference->author[$i]->multi->{'_key'}->literal))
+				{
+					foreach ($reference->author[$i]->multi->{'_key'}->literal as $language => $value)
+					{
+						$triples[] = $author_id . ' <http://schema.org/name> ' . '"' . addcslashes($value, '"') . '"@' . $language . ' .';
+					}
+				}	
+			}
+			else
+			{
+				$triples[] = $author_id . ' <http://schema.org/name> ' . '"' . addcslashes($reference->author[0]->name, '"') . '"@' . $language . ' .';					
+			}
+			
+			// assume is a person, need to handle cases where this is not true
+			$triples[] = $author_id . ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ' . ' <http://schema.org/Person>' . ' .';			
+		
+			$use_role = true;
+							
+			if ($use_role)
+			{
+				// Role to hold author position
+				$role_id = '<' . $subject_id . '#role/' . $index . '>';
+				
+				$triples[] = $role_id . ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ' . ' <http://schema.org/Role>' . ' .';			
+				$triples[] = $role_id . ' <http://schema.org/roleName> "' . $index . '" .';			
+			
+				$triples[] = $s . ' <http://schema.org/creator> ' .  $role_id . ' .';
+				$triples[] = $role_id . ' <http://schema.org/creator> ' .  $author_id . ' .';
+			}
+			else
+			{
+				// Author is creator
+				$triples[] = $s . ' <http://schema.org/creator> ' .  $author_id . ' .';						
+			}
+			
+		}
+	}	
+
+
+	if (isset($reference->journal))
+	{
+		$journal_id = $subject_id . '#container';
+		
+		
+		$issns = array();
+		if (isset($reference->journal->identifier))
+		{
+			foreach ($reference->journal->identifier as $identifier)
+			{
+				switch ($identifier->type)
+				{
+					case 'issn':
+						$issns[] = $identifier->id;
+						break;
+						
+					default:
+						break;
+				}
+			}
+		}
+		
+		if (count($issns) > 0)
+		{
+			$journal_id = 'http://worldcat.org/issn/' . $issns[0];
+		}
+				
+		$triples[] = $s . ' <http://schema.org/isPartOf> ' . '<' . $journal_id . '> .';
+		
+		foreach ($issns as $issn)
+		{
+			$triples[] = '<' . $journal_id . '> <http://schema.org/issn> ' . '"' . $issn. '"' . ' .';		
+		}
+		
+		switch ($reference->type)
+		{
+			case 'article':
+				$triples[] = '<' . $journal_id . '> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/Periodical> .';	
+				break;
+		
+			default:
+				break;
+		}
+		
+				
+		if (isset($reference->journal->multi))
+		{
+			if (isset($reference->journal->multi->{'_key'}->name))
+			{
+				foreach ($reference->journal->multi->{'_key'}->name as $language => $value)
+				{
+					$triples[] = '<' . $journal_id . '> <http://schema.org/name> ' . '"' . addcslashes($value, '"') . '"@' . $language . ' .';
+				}
+			}		
+		}
+		else
+		{
+			if (isset($reference->journal->name))
+			{
+				$triples[] = '<' . $journal_id . '> <http://schema.org/name> ' . '"' . addcslashes($reference->journal->name, '"') . '"' . ' .';		
+			}
+		}
+	
+		if (isset($reference->journal->volume))
+		{
+			$triples[] = $s . ' <http://schema.org/volumeNumber> ' . '"' . addcslashes($reference->journal->volume, '"') . '" .';
+		}
+		if (isset($reference->journal->issue))
+		{
+			$triples[] = $s . ' <http://schema.org/issueNumber> ' . '"' . addcslashes($reference->journal->issue, '"') . '" .';
+		}
+		if (isset($reference->journal->pages))
+		{
+			$triples[] = $s . ' <http://schema.org/pagination> ' . '"' . addcslashes(str_replace('--', '-', $reference->journal->pages), '"') . '" .';
+		}
+	}
+	
+	if (isset($reference->link))
+	{
+		foreach ($reference->link as $link)
+		{
+			switch ($link->anchor)
+			{
+				case 'LINK':
+					$triples[] = $s . ' <http://schema.org/url> ' . '"' . $link->url . '" .';				
+					$sameAs[] = $link->url;
+					break;
+
+				// eventually handle this difefrently, cf Ozymandias
+				case 'PDF':
+					$sameAs[] = $link->url;
+					break;
+			
+				default:
+					break;
+			}
+		}
+	}
+	
+	$sameAs = array_unique($sameAs);
+	foreach ($sameAs as $link)
+	{
+		$triples[] = $s . ' <http://schema.org/sameAs> ' . '"' . addcslashes($link, '"') . '" .';		
+	}
+	
+	if (isset($reference->date))
+	{
+		$triples[] = $s . ' <http://schema.org/datePublished> ' . '"' . addcslashes($reference->date, '"') . '" .';			
+	}
+	else
+	{
+		if (isset($reference->year))
+		{
+			$triples[] = $s . ' <http://schema.org/datePublished> ' . '"' . addcslashes($reference->year, '"') . '" .';					
+		}
+	}
+	
+	
+	
+
+/*
+
+	$citeproc_obj = array();
+	$citeproc_obj['id'] = $id;
+
+	$citeproc_obj['unstructured'] = reference_to_citation_string($reference);
+	
+	$citeproc_obj['title'] = $reference->title;
+	
+	if (isset($reference->abstract))
+	{
+		$citeproc_obj['abstract'] = $reference->abstract;
+	}
+	
+	// multi
+	if (isset($reference->multi))
+	{
+		$citeproc_obj['multi'] = $reference->multi;
+	}
+	
+	
+	if (isset($reference->journal))
+	{	
+		$citeproc_obj['type'] = 'article-journal';
+	}
+	
+	if (isset($reference->date))
+	{
+		$citeproc_obj['issued'] = new stdclass;
+		$citeproc_obj['issued']->{'date-parts'} = array();
+		$citeproc_obj['issued']->{'date-parts'}[0] = array();
+		$parts = explode('-', $reference->date);
+		
+		$citeproc_obj['issued']->{'date-parts'}[0][] = (Integer)$parts[0];
+
+		if ($parts[1] != '00')
+		{		
+			$citeproc_obj['issued']->{'date-parts'}[0][] = (Integer)$parts[1];
+		}
+
+		if ($parts[2] != '00')
+		{		
+			$citeproc_obj['issued']->{'date-parts'}[0][] = (Integer)$parts[2];
+		}
+	
+	}
+	else
+	{
+		if (isset($reference->year))
+		{
+			$citeproc_obj['issued'] = new stdclass;
+			$citeproc_obj['issued']->{'date-parts'} = array();
+			$citeproc_obj['issued']->{'date-parts'}[] = array((Integer)$reference->year);
+		}
+	}
+	
+	if (isset($reference->publisher))
+	{
+		$citeproc_obj['publisher'] = $reference->publisher;
+	}
+	if (isset($reference->publoc))
+	{
+		$citeproc_obj['publisher-place'] = $reference->publoc;
+	}
+	
+	
+	if (isset($reference->author))
+	{
+		$citeproc_obj['author'] = array();
+
+		foreach ($reference->author as $author)
+		{
+			$a = array();
+			if (isset($author->firstname))
+			{
+				$a['given'] = $author->firstname;
+				$a['family'] = $author->lastname;
+			}
+			else
+			{
+				$a['literal'] = $author->name;
+				//$a['family'] = $author->name;
+			}
+
+			if (isset($author->multi))
+			{
+				$a['multi']= $author->multi;
+			}
+			
+			$citeproc_obj['author'][] = $a;
+		}
+		
+	}
+	
+	if (isset($reference->journal))
+	{
+		$citeproc_obj['container-title'] = $reference->journal->name;
+		
+		if (isset($reference->journal->series))
+		{
+			$citeproc_obj['collection-title'] = $reference->journal->series;
+		}
+		
+		if (isset($reference->journal->volume))
+		{
+			$citeproc_obj['volume'] = $reference->journal->volume;
+		}
+		
+		if (isset($reference->journal->issue))
+		{
+			$citeproc_obj['issue'] = $reference->journal->issue;
+		}
+		if (isset($reference->journal->pages))
+		{	
+			$citeproc_obj['page'] = str_replace('--', '-', $reference->journal->pages);
+			
+			if (preg_match('/^[a-z]?\d+$/', $reference->journal->pages, $m))
+			{
+				$citeproc_obj['page-first'] = $reference->journal->pages;
+			}
+
+			if (preg_match('/(?<spage>\d+)-(?<epage>\d+)/', $reference->journal->pages, $m))
+			{
+				$citeproc_obj['page-first'] = $m['spage'];
+			}
+			
+		}
+		
+		if (isset($reference->journal->identifier))
+		{
+			foreach ($reference->journal->identifier as $identifier)
+			{
+				switch ($identifier->type)
+				{
+					case 'issn':
+						$citeproc_obj['ISSN'][] = $identifier->id;
+						break;
+					default:
+						break;
+				}
+			}
+		}
+		
+	// multi
+	if (isset($reference->journal->multi))
+	{
+		if (isset($citeproc_obj['multi']))
+		{
+			$citeproc_obj['multi']->_key->{'container-title'} = $reference->journal->multi->_key->name;
+		}
+		else
+		{
+			$citeproc_obj['multi']= $reference->journal->multi;
+		}
+	}
+		
+		
+	}
+	
+	if (isset($reference->identifier))
+	{
+		$citeproc_obj['alternative-id'] = array(); 
+		foreach ($reference->identifier as $identifier)
+		{
+			switch ($identifier->type)
+			{
+				case 'cinii':
+					$citeproc_obj['CINII'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'CINII:' . $identifier->id;
+					break;
+			
+				case 'doi':
+					$citeproc_obj['DOI'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'DOI:' . $identifier->id;
+					break;
+
+				case 'handle':
+					$citeproc_obj['HANDLE'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					break;
+
+				case 'isbn':
+				case 'isbn10':
+				case 'isbn13':
+					$citeproc_obj['ISBN'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					break;
+
+				case 'jstor':
+					$citeproc_obj['JSTOR'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'JSTOR:' . $identifier->id;
+					break;
+
+				case 'pmid':
+					$citeproc_obj['PMID'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'PMID:' . $identifier->id;
+					break;
+
+				case 'pmc':
+					$citeproc_obj['PMC'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'PMC:' . $identifier->id;
+					break;
+					
+				case 'pii':
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'PII:' . $identifier->id;
+					break;
+
+				case 'oai':
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					break;
+					
+				case 'zenodo':
+					$citeproc_obj['ZENODO'] = $identifier->id;
+					break;
+					
+				default:
+					break;
+			}
+		}
+	}
+*/
+	
+	$nt = join("\n", $triples);	
+	return $nt;
+}
+
 ?>
