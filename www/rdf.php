@@ -30,6 +30,14 @@ if (isset($_GET['guid']))
 	$guid = $_GET['guid'];
 }
 
+$debug = false;
+if (isset($_GET['debug']))
+{
+	$debug = true;
+}
+
+
+
 
 //--------------------------------------------------------------------------------------------------
 $db = NewADOConnection('mysqli');
@@ -270,6 +278,14 @@ if ($result->NumRows() == 1)
 		$identifier->id = $result->fields['jstor'];
 		$reference->identifier[] = $identifier;
 	}
+
+	if ($result->fields['cinii'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'cinii';
+		$identifier->id = $result->fields['cinii'];
+		$reference->identifier[] = $identifier;
+	}
 	
 	
 	
@@ -411,7 +427,7 @@ if ($result->NumRows() == 1)
 
 	if ($result->fields['jstor'] != '')
 	{
-		get_jstor_thumbnail($reference, $result->fields['jstor']);
+		//get_jstor_thumbnail($reference, $result->fields['jstor']);
 	}
 
 	if ($result->fields['thumbnailUrl'] != '')
@@ -475,8 +491,6 @@ if ($result->NumRows() == 1)
 				}
 				
 				$authors = explode($delimiter, trim($value));
-				
-				
 				
 				$n = count($authors);
 				

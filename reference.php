@@ -728,7 +728,7 @@ function reference_to_rdf($reference)
 	
 	if (preg_match('/^10./', $guid))
 	{
-		$guid = 'https://doi.org/' . $guid;
+		$guid = 'https://doi.org/' . strtolower($guid);
 		
 		$sameAs[] = $guid;
 	}
@@ -770,6 +770,34 @@ function reference_to_rdf($reference)
 		}
 	}
 	
+	//-----------------------------------------
+	// Abstract
+	$have_abstract = false;
+	
+	if (isset($reference->multi))
+	{
+		if (isset($reference->multi->{'_key'}->abstract))
+		{
+			$have_abstract = true;
+			
+			foreach ($reference->multi->{'_key'}->abstract as $language => $value)
+			{
+				$triples[] = $s . ' <http://schema.org/description> ' . '"' . addcslashes($value, '"') . '"@' . $language . ' .';
+			}
+		}	
+	}
+	
+	if (!$have_abstract)
+	{
+		if (isset($reference->abstract))
+		{
+			$triples[] = $s . ' <http://schema.org/description> ' . '"' . addcslashes($reference->abstract, '"') . '" .';		
+		}
+	}
+
+	//-----------------------------------------
+	// Authors
+	
 	if (isset($reference->author))
 	{
 	
@@ -793,7 +821,7 @@ function reference_to_rdf($reference)
 			}
 			else
 			{
-				$triples[] = $author_id . ' <http://schema.org/name> ' . '"' . addcslashes($reference->author[0]->name, '"') . '"@' . $language . ' .';					
+				$triples[] = $author_id . ' <http://schema.org/name> ' . '"' . addcslashes($reference->author[$i]->name, '"') . '" .';					
 			}
 			
 			// assume is a person, need to handle cases where this is not true
@@ -822,9 +850,12 @@ function reference_to_rdf($reference)
 	}	
 
 
+	//------------------------------------------------------------------------------------
 	if (isset($reference->journal))
 	{
 		$journal_id = $subject_id . '#container';
+		
+		$sici = array();
 		
 		
 		$issns = array();
@@ -847,6 +878,13 @@ function reference_to_rdf($reference)
 		if (count($issns) > 0)
 		{
 			$journal_id = 'http://worldcat.org/issn/' . $issns[0];
+			
+			$sici[] = $issns[0];
+
+			if (isset($reference->year))
+			{
+				$sici[] = '(' . $reference->year . ')';
+			}
 		}
 				
 		$triples[] = $s . ' <http://schema.org/isPartOf> ' . '<' . $journal_id . '> .';
@@ -888,6 +926,8 @@ function reference_to_rdf($reference)
 		if (isset($reference->journal->volume))
 		{
 			$triples[] = $s . ' <http://schema.org/volumeNumber> ' . '"' . addcslashes($reference->journal->volume, '"') . '" .';
+			
+			$sici[] = $reference->journal->volume;
 		}
 		if (isset($reference->journal->issue))
 		{
@@ -896,9 +936,30 @@ function reference_to_rdf($reference)
 		if (isset($reference->journal->pages))
 		{
 			$triples[] = $s . ' <http://schema.org/pagination> ' . '"' . addcslashes(str_replace('--', '-', $reference->journal->pages), '"') . '" .';
+
+			if (preg_match('/(?<spage>[a-z]?\d+)/', $reference->journal->pages, $m))
+			{
+				$sici[] = '<' . $m['spage'] . '>';
+			}
 		}
+		
+		
+		// sici to help reference linking
+		if (count($sici) == 4)
+		{
+			$identifier_id = '<' . $subject_id . '#sici' . '>';
+
+			$triples[] = $s . ' <http://schema.org/identifier> ' . $identifier_id . '.';			
+			$triples[] = $identifier_id . ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/PropertyValue> .';
+			$triples[] = $identifier_id . ' <http://schema.org/propertyID> ' . '"sici"' . '.';
+			$triples[] = $identifier_id . ' <http://schema.org/value> ' . '"' . addcslashes(join('', $sici), '"') . '"' . '.';		
+		}
+		
+		
+		
 	}
 	
+	//------------------------------------------------------------------------------------
 	if (isset($reference->link))
 	{
 		foreach ($reference->link as $link)
@@ -921,12 +982,82 @@ function reference_to_rdf($reference)
 		}
 	}
 	
+	//------------------------------------------------------------------------------------
+	// Identifiers
+	
+	
+	if (isset($reference->identifier))
+	{
+		foreach ($reference->identifier as $identifier)
+		{
+			$identifier_id = '';
+		
+			switch ($identifier->type)
+			{
+			
+				case 'cinii':
+					$identifier_id = '<' . $subject_id . '#cinii' . '>';
+
+					$triples[] = $identifier_id . ' <http://schema.org/propertyID> ' . '"cinii"' . '.';
+					$triples[] = $identifier_id . ' <http://schema.org/value> ' . '"' . $identifier->id . '"' . '.';
+				
+					// Consistent with CiNii RDF
+					$sameAs[]  = 'https://ci.nii.ac.jp/naid/' . $identifier->id . '#article';
+					break;
+			
+			
+				case 'doi':
+					$identifier_id = '<' . $subject_id . '#doi' . '>';
+
+					$triples[] = $identifier_id . ' <http://schema.org/propertyID> ' . '"doi"' . '.';
+					$triples[] = $identifier_id . ' <http://schema.org/value> ' . '"' . $identifier->id . '"' . '.';
+				
+					$sameAs[]  = 'https://doi.org/' . $identifier->id;
+					break;
+					
+				case 'handle':
+					$identifier_id = '<' . $subject_id . '#handle' . '>';
+
+					$triples[] = $identifier_id . ' <http://schema.org/propertyID> ' . '"handle"' . '.';
+					$triples[] = $identifier_id . ' <http://schema.org/value> ' . '"' . $identifier->id . '"' . '.';
+				
+					$sameAs[]  = 'https://hdl.handle.net/' . $identifier->id;
+					break;
+
+				case 'jstor':
+					$identifier_id = '<' . $subject_id . '#jstor' . '>';
+
+					$triples[] = $identifier_id . ' <http://schema.org/propertyID> ' . '"jstor"' . '.';
+					$triples[] = $identifier_id . ' <http://schema.org/value> ' . '"' . $identifier->id . '"' . '.';
+				
+					$sameAs[]  = 'https://www.jstor.org/stable/' . $identifier->id;
+					break;
+			
+			
+				default:
+					break;
+			}
+			
+			if ($identifier_id != '')
+			{
+				$triples[] = $s . ' <http://schema.org/identifier> ' . $identifier_id . '.';			
+				$triples[] = $identifier_id . ' <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://schema.org/PropertyValue> .';			
+			}
+		
+		}
+	
+	}	
+		
+	
+	//------------------------------------------------------------------------------------
+	// Links to other versions/instances/representations
 	$sameAs = array_unique($sameAs);
 	foreach ($sameAs as $link)
 	{
 		$triples[] = $s . ' <http://schema.org/sameAs> ' . '"' . addcslashes($link, '"') . '" .';		
 	}
 	
+	//------------------------------------------------------------------------------------
 	if (isset($reference->date))
 	{
 		$triples[] = $s . ' <http://schema.org/datePublished> ' . '"' . addcslashes($reference->date, '"') . '" .';			
