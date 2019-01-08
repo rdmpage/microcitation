@@ -337,6 +337,7 @@ function process_ris_key($key, $value, &$obj)
 		   if (!isset($obj->year))
 		   {
 		   		$obj->year = $value;
+		   		$obj->year = str_replace('/', '', $obj->year);
 		   }
 		   
 		   break;
