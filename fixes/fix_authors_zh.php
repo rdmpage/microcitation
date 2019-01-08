@@ -2,7 +2,7 @@
 
 // fix cases where we have both English and Chinese names in author field
 // Sometimes Wangfang data conacatenates Chinese and English name sof authors into one string.
-// Detecte these by testing if string has even number of parts (split on ';') and one half is 
+// Detect these by testing if string has even number of parts (split on ';') and one half is 
 // Chinese the other half English. If so, split by langauge and upldate database.
 
 // example 钟应洪;黎祖群;高向雄;Zhong Yinghong;Li Zuqun;Gao Xiangxiong 10.3969/j.issn.1003-4692.1999.05.013
@@ -59,7 +59,7 @@ function split_by_language($value)
 }
 
 //----------------------------------------------------------------------------------------
-$db = NewADOConnection('mysql');
+$db = NewADOConnection('mysqli');
 $db->Connect("localhost", 
 	$config['db_user'] , $config['db_passwd'] , $config['db_name']);
 
@@ -75,6 +75,7 @@ $sql = 'SELECT * FROM multilingual WHERE guid LIKE "10.3969/j.issn.1003-4692%" A
 
 $sql = 'SELECT * FROM multilingual WHERE guid LIKE "10.3969/j.issn.1000-1565%" AND `key`="authors"';
 
+$sql = 'SELECT * FROM multilingual WHERE guid LIKE "10.3969/j.issn.1000-3142%" AND `key`="authors"';
 
 
 //echo $sql . "\n";

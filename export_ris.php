@@ -21,7 +21,7 @@ $field_to_ris_key = array(
 	);
 
 //--------------------------------------------------------------------------------------------------
-$db = NewADOConnection('mysql');
+$db = NewADOConnection('mysqli');
 $db->Connect("localhost", 
 	$config['db_user'] , $config['db_passwd'] , $config['db_name']);
 
@@ -195,6 +195,11 @@ $issn = '0067-1975';
 $issn = '0374-7859';
 $issn = '0863-1867';
 $issn = '0187-7151';
+$issn = '0365-4508';
+//$issn = '0374-7859';
+
+$issn = '0068-547X';
+$issn ='0365-4508';
 
 $sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
 
@@ -225,16 +230,20 @@ $sql = 'SELECT * FROM publications WHERE journal ="The Raffles Bulletin of Zoolo
 
 $sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
 
-//$sql .= ' AND volume IN(1,2)';
+$sql .= ' AND volume IN(64,46,48)';
 
 //$sql = 'SELECT * FROM publications where journal like "Studies and%"';
 
-$sql .= ' AND year >= 2017';
+//$sql .= ' AND year >= 1970';
+
+//$sql .= ' AND year BETWEEN 1920 AND 1929';
+//$sql .= ' AND volume = 11';
+
 //$sql .= ' and spage <> 0';
 
 //$sql .= ' AND doi IS NULL and year > 2011';
 
-
+//$sql = 'SELECT * FROM publications WHERE guid="https://www.nparks.gov.sg/sbg/research/publications/gardens-bulletin-singapore/-/media/sbg/gardens-bulletin/4-4-36-2-06-y1983-v36p2-gbs-pg-205.pdf"';
 
 $sql .= ' ORDER BY CAST(series as SIGNED), CAST(volume as SIGNED), issue, CAST(spage as SIGNED)';
 
