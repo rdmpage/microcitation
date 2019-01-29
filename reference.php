@@ -726,12 +726,30 @@ function reference_to_rdf($reference)
 	
 	$guid = $reference->guid;
 	
-	if (preg_match('/^10./', $guid))
+	// DOI
+	if (preg_match('/^10\./', $guid))
 	{
 		$guid = 'https://doi.org/' . strtolower($guid);
 		
 		$sameAs[] = $guid;
 	}
+
+	// jstor
+	if (preg_match('/http:\/\/www.jstor.org/', $guid))
+	{
+		$guid = str_replace('http', 'https', $guid);
+		
+		$sameAs[] = $guid;
+	}
+	
+	// handle
+	if (preg_match('/^\d+\/[a-z0-9]+$/', $guid))
+	{
+		$guid = 'https://hdl.handle.net/' . strtolower($guid);
+		
+		$sameAs[] = $guid;
+	}
+	
 	
 	$subject_id = $guid; // fix this
 
