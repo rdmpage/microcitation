@@ -390,7 +390,7 @@ function process_ris_key($key, $value, &$obj)
 				$obj->link[] = $link;
 			
 				// extract...
-				if (preg_match('/http:\/\/hdl.handle.net\/(?<id>.*)/', $value, $m))
+				if (preg_match('/https?:\/\/hdl.handle.net\/(?<id>.*)/', $value, $m))
 				{
 					$identifier = new stdclass;
 					$identifier->type = 'handle';
