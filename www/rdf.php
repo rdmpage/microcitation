@@ -57,14 +57,14 @@ $sql = 'SELECT * FROM publications WHERE guid="' . $guid . '"';
 
 if (!preg_match('/^10\./', $guid))
 {	
-	if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)/', $guid, $m))
+	if (preg_match('/https?:\/\/www.jstor.org\/stable\/(?<id>\d+)/', $guid, $m))
 	{
 		$sql .= ' OR jstor=' . $m['id'];
 	}
 	else
 	{
 	
-		if (preg_match('/^http:\/\//', $guid))
+		if (preg_match('/^https?:\/\//', $guid))
 		{
 			$sql .= ' OR url="' . $guid . '"';
 		}
