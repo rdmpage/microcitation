@@ -485,6 +485,7 @@ if ($result->NumRows() == 1)
 				
 				$delimiter = ';';
 				
+				//?
 				if ($issn == '1000-470X')
 				{
 					$delimiter = ',';

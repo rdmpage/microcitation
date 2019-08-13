@@ -137,10 +137,18 @@ if ($result->NumRows() == 1)
 		);
 
 		$compacted = jsonld_compact($doc, $context);
+		
+		$frame = (object)array(
+				'@context' => $context,
+				'@type' => 'http://schema.org/ScholarlyArticle'
+			);
+			
+
+			$data = jsonld_frame($doc, $frame);		
 	
 		//print_r($compacted);
 
-		echo json_encode($compacted, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+		echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
 		echo "\n";
 	}
