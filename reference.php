@@ -292,7 +292,12 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 					$citeproc_obj['HANDLE'] = $identifier->id;
 					$citeproc_obj['alternative-id'][] = $identifier->id;
 					break;
-
+					
+				case 'internetarchive':
+					$citeproc_obj['ARCHIVE'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = $identifier->id;
+					break;
+					
 				case 'isbn':
 				case 'isbn10':
 				case 'isbn13':
@@ -840,6 +845,15 @@ function reference_to_rdf($reference)
 			else
 			{
 				$triples[] = $author_id . ' <http://schema.org/name> ' . '"' . addcslashes($reference->author[$i]->name, '"') . '" .';					
+				
+				if (isset($reference->author[$i]->firstname))
+				{
+					$triples[] = $author_id . ' <http://schema.org/givenName> ' . '"' . addcslashes($reference->author[$i]->firstname, '"') . '" .';					
+				}
+				if (isset($reference->author[$i]->lastname))
+				{
+					$triples[] = $author_id . ' <http://schema.org/familyName> ' . '"' . addcslashes($reference->author[$i]->lastname, '"') . '" .';					
+				}
 			}
 			
 			// assume is a person, need to handle cases where this is not true

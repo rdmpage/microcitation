@@ -105,13 +105,12 @@ function get_pdf_thumbnail(&$reference, $pdf)
 $guid = 'http://www.jstor.org/stable/3668632';
 $guid = '10.3767/000651906x622210';
 
-$guid = '';
+//$guid = '';
 
 if (isset($_GET['guid']))
 {
 	$guid = $_GET['guid'];
 }
-
 
 //--------------------------------------------------------------------------------------------------
 $db = NewADOConnection('mysqli');
@@ -291,6 +290,15 @@ if ($result->NumRows() == 1)
 	
 	// identifiers and links
 	
+	if ($result->fields['internetarchive'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'internetarchive';
+		$identifier->id = $result->fields['internetarchive'];
+		$reference->identifier[] = $identifier;
+	}
+	
+	
 	if ($result->fields['cinii'] != '')
 	{
 		$identifier = new stdclass;
@@ -298,8 +306,7 @@ if ($result->NumRows() == 1)
 		$identifier->id = $result->fields['cinii'];
 		$reference->identifier[] = $identifier;
 	}
-	
-	
+		
 	if ($result->fields['doi'] != '')
 	{
 		$identifier = new stdclass;
@@ -307,6 +314,7 @@ if ($result->NumRows() == 1)
 		$identifier->id = $result->fields['doi'];
 		$reference->identifier[] = $identifier;
 	}
+	
 	if ($result->fields['handle'] != '')
 	{
 		$identifier = new stdclass;
@@ -338,6 +346,7 @@ if ($result->NumRows() == 1)
 		$identifier->id = $result->fields['pmid'];
 		$reference->identifier[] = $identifier;
 	}
+	
 	if ($result->fields['pmc'] != '')
 	{
 		$identifier = new stdclass;
@@ -354,8 +363,6 @@ if ($result->NumRows() == 1)
 		$reference->identifier[] = $identifier;
 	}
 	
-	
-	
 	// zootaxa
 	if ($result->fields['zootaxa_url'] != '')
 	{
@@ -369,6 +376,7 @@ if ($result->NumRows() == 1)
 			$thumbnail_url = $link->url;
 		}
 	}	
+	
 	if ($result->fields['zootaxa_pdf_url'] != '')
 	{
 		$link = new stdclass;
@@ -383,8 +391,6 @@ if ($result->NumRows() == 1)
 		
 	}	
 	
-	
-	
 	if ($result->fields['url'] != '')
 	{
 		$link = new stdclass;
@@ -392,6 +398,7 @@ if ($result->NumRows() == 1)
 		$link->url = $result->fields['url'];
 		$reference->link[] = $link;
 	}	
+	
 	if ($result->fields['pdf'] != '')
 	{
 		$link = new stdclass;
@@ -402,10 +409,8 @@ if ($result->NumRows() == 1)
 		if ($thumbnail_url == '')
 		{
 			$thumbnail_url = $link->url;
-		}
-		
-	}	
-	
+		}		
+	}		
 	
 	// Zenodo, may be DOI or URL
 	if ($result->fields['zenodo'] != '')
@@ -432,11 +437,7 @@ if ($result->NumRows() == 1)
 		$identifier->type = 'zenodo';
 		$identifier->id = $zenodo;
 		$reference->identifier[] = $identifier;
-	
-	
 	}
-	
-	
 	
 
 	if ($result->fields['xml'] != '')
