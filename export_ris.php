@@ -243,7 +243,52 @@ $sql .= ' AND volume IN(64,46,48)';
 
 //$sql .= ' AND doi IS NULL and year > 2011';
 
-//$sql = 'SELECT * FROM publications WHERE guid="https://www.nparks.gov.sg/sbg/research/publications/gardens-bulletin-singapore/-/media/sbg/gardens-bulletin/4-4-36-2-06-y1983-v36p2-gbs-pg-205.pdf"';
+$sql = 'SELECT * FROM publications WHERE guid="https://florabase.dpaw.wa.gov.au/nuytsia/article/795"';
+$sql = 'SELECT * FROM publications WHERE guid="10.15553/c2014v691a5"';
+$sql = 'SELECT * FROM publications WHERE guid="http://researcharchive.calacademy.org/research/scipubs/pdfs/v58/proccas_v58_n08.pdf"';
+$sql = 'SELECT * FROM publications WHERE guid="http://ejournal.sinica.edu.tw/bbas/content/2012/3/Bot533-14/Bot533-14.html"';
+$sql = 'SELECT * FROM publications WHERE guid="http://journal.upao.edu.pe/Arnaldoa/article/view/683"';
+$sql = 'SELECT * FROM publications WHERE guid="10.15517/lank.v17i1.28479"';
+
+$sql = 'SELECT * FROM publications WHERE guid="10.6165/tai.2015.60.39"';
+
+$sql = 'SELECT * FROM publications WHERE guid="10.7751/telopea8469"';
+
+$sql = 'SELECT * FROM publications WHERE guid="https://www.rbg.vic.gov.au/documents/MuelleriaVol_34_-_p47-54_Molyneux.pdf"';
+$sql = 'SELECT * FROM publications WHERE guid="https://www.qld.gov.au/dsiti/assets/documents/austrobaileya/bean-new-solanum-species-png-austrobaileya-v9s4-p560-599.pdf"';
+
+$sql = 'SELECT * FROM publications WHERE guid="10.20531/tfb.2016.44.2.08"';
+
+$sql = 'SELECT * FROM publications WHERE guid="https://lkcnhm.nus.edu.sg/app/uploads/2017/06/63rbz448-453.pdf"';
+
+// Archivos do Museu Nacional do Rio de Janeiro
+$sql = 'SELECT * FROM publications WHERE issn="0365-4508" AND volume=33';
+
+$sql = 'SELECT * FROM publications WHERE guid="10.5735/085.047.0307"';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="1934-5259" AND volume=8';
+
+$sql = "select * from publications where issn='0217-2445' and pdf is not null and internetarchive is null";
+
+$sql = 'SELECT * FROM publications WHERE guid="http://www.repository.naturalis.nl/record/525521"';
+
+$sql = 'SELECT * FROM publications WHERE guid="ZOOREC:ZOOR14703021123"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0149-175X" AND year > 2010';
+
+$sql = 'SELECT * FROM publications WHERE issn="0033-2615" AND year In (1979, 1980)';
+
+$sql = 'SELECT * FROM publications WHERE issn="0024-9637" AND year > 2012';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0068-547X" AND volume="56, Supplement I"';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0312-9764" AND volume="9" AND issue="4"';
+
+$sql = "SELECT * FROM `publications` where (`publications`.`issn` IN ('0083-7903','1174-0043'))";
+
 
 $sql .= ' ORDER BY CAST(series as SIGNED), CAST(volume as SIGNED), issue, CAST(spage as SIGNED)';
 

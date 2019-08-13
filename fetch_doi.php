@@ -13098,8 +13098,30 @@ $dois=array(
 );
 
 $dois=array(
-'10.1017/S0370164600000195')
+//'10.1017/S0370164600000195'
+
+'10.1080/01916122.1997.9989495',
+'10.1080/01916122.1990.9989374',
+'10.1080/01916122.2007.9989637',
+'10.2113/gspalynol.33.1.101',
+'10.1080/01916122.2016.1146174',
+
+)
 ;
+
+$dois=array(
+'10.5248/132.305'
+);
+
+$dois=array(
+'10.15560/9.2.257'
+);
+
+$dois=array(
+'10.5169/seals-257912'
+);
+
+$dois=array('10.1051/acarologia/20102013');
 
 	$count = 0;
 	foreach ($dois as $doi)
@@ -13107,7 +13129,7 @@ $dois=array(
 		echo "-- $doi\n";
 		
 		
-		if (1)
+		if (0)
 		{
 			$reference = new stdclass;
 			get_doi_metadata_unixref($doi, $reference);
@@ -13115,7 +13137,7 @@ $dois=array(
 		else
 		{
 			$json = '';
-			get_doi_metadata($doi, $json);
+			$reference = get_doi_metadata($doi, $json);
 		}
 		
 		//parse_meta($doi, $reference);

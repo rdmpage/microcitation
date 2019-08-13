@@ -868,11 +868,24 @@ $issn ='0370-3681';
 $issn ='0370-5412';
 $issn ='1314-2011';
 $issn ='0370-1646';
+$issn ='0093-4666';
+
+$issn = '0040-0262'; // taxon in Wiley 2000-onwards
+
+$issn = '0003-9284';
+$issn = '1869-0963';
+$issn = '0033-2615';
+
+$issn ='0008-347X';
+
+$issn = '1514-5158';
+
+$issn = '0037-928X';
 
 
 //for ($y = 1890; $y <= 2018; $y++)
 //for ($y = 2015; $y <= 2015; $y++)
-for ($y = 1840; $y <= 1940; $y++)
+for ($y = 2008; $y <= 2019; $y++)
 {
 	$count = 0;
 	$page = '';
@@ -886,7 +899,7 @@ for ($y = 1840; $y <= 1940; $y++)
 	
 		//$url = 'http://search.crossref.org/dois?q=' . $issn . '&header=true' . '&page=' . $page . '&year=2011&volume=15';
 	
-		$url = 'http://search.crossref.org/dois?q=' . $issn . '&header=true' . '&page=' . $page . '&year=' . $y; 
+		$url = 'http://search.crossref.org/dois?q=' . urlencode('Bulletin de la Société entomologique de France') . '&header=true' . '&page=' . $page . '&year=' . $y; 
 	
 	
 		//$url = 'http://search.crossref.org/dois?q=Telopea&year=1922&publication=Telopea' . '&header=true' . '&page=' . $page . '&year=' . $y; 
@@ -937,14 +950,20 @@ for ($y = 1840; $y <= 1940; $y++)
 			  $params[$key][] = trim(urldecode($value));
 			}
 		
-			if (0)
+			if (1)
 			{
 				// Update
-				$sql = "UPDATE publications SET guid='" . addcslashes(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]), "'") . "'"
-					. ", doi='" . addcslashes(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]), "'") . "'"
-					. " WHERE issn='$issn' AND volume='" . addcslashes($params['rft.volume'][0], "'") . "' AND spage='" . addcslashes($params['rft.spage'][0], "'") . "'"
-					. ";";
-				echo $sql . "\n";
+				
+				if (($params['rft.volume'][0] != '') && ($params['rft.spage'][0] != ''))
+				{
+				
+					$sql = "UPDATE publications SET guid='" . addcslashes(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]), "'") . "'"
+						. ", doi='" . addcslashes(preg_replace('/info:doi\/(http:\/\/dx.doi.org\/)?/', '', $params['rft_id'][0]), "'") . "'"
+						. " WHERE issn='$issn' AND volume='" . addcslashes($params['rft.volume'][0], "'") . "' AND spage='" . addcslashes($params['rft.spage'][0], "'") . "'"
+						. ";";
+					echo $sql . "\n";
+				
+				}
 			}
 			else
 			{
@@ -1009,6 +1028,9 @@ for ($y = 1840; $y <= 1940; $y++)
 					case '0187-7151':
 					case '0031-1820':
 					//case '0301-2123':
+					
+					case '0008-347X':
+					
 						get_meta($doi, $keys, $values);
 						
 						//print_r($keys);

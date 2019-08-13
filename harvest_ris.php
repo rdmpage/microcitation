@@ -127,16 +127,38 @@ function ris_import($reference)
 			if ($link->anchor == 'LINK')
 			{
 				$guid = $link->url;
+				
+				
+				$add = true;
 			
 				if (preg_match('/http:\/\/dx.doi.org\//', $link->url))
 				{
 					// ignore DOIs
+					$add = false;
 				}
-				else
-				{			
+				
+				if (preg_match('/https?:\/\/hdl.handle.net\//', $link->url))
+				{
+					// ignore handles
+					$add = false;
+				}
+
+				if (preg_match('/https?:\/\/www.jstor.org\//', $link->url))
+				{
+					// ignore jstor
+					$add = false;
+					$add = true;
+				}
+				
+				
+				if ($add)
+				{		
+					if (1)	
+					{
 					$keys[] = 'url';
 					$values[] = '"' . $link->url . '"';
-				
+					}
+					
 					if (0)
 					{			
 						if (preg_match('/http:\/\/www.jstor.org\/stable\/(?<id>\d+)$/', $link->url, $m))
@@ -358,8 +380,8 @@ function ris_import($reference)
 	// Import prior to a given date
 	if (0) 
 	{
-		// && in_array($reference->year, array(2005,2006,2007)))
-		if (isset($reference->year)  && ($reference->year < 2009))
+		// && in_array($reference->year, array(2009,2010,2011, 2012)))
+		if (isset($reference->year)  && in_array($reference->year, array(2009,2010,2011, 2012)))
 		
 //		if (isset($reference->year)  && in_array($reference->year, array(2005)))
 		
@@ -375,7 +397,7 @@ function ris_import($reference)
 	// Import JSTOR if it has a DOI
 	if (0) 
 	{
-		if (isset($reference->year))
+		if (isset($reference->year)  && ($reference->year == 2007))
 		{
 			if (preg_match('/^10\./', $guid))
 			{
@@ -389,7 +411,7 @@ function ris_import($reference)
 	// Add data to existing record
 	if (0) 	
 	{
-		if ($reference->year > 2008) 
+		if ($reference->year >= 2000) 
 		{
 		
 			$qualifiers = array();
@@ -466,6 +488,7 @@ function ris_import($reference)
 						}
 					}
 				}
+				
 			
 			
 			}
@@ -477,8 +500,8 @@ function ris_import($reference)
 	// Add JSTOR to existing record
 	if (0) 
 	{
-		//if (isset($reference->year) && ($reference->year >= 2006))
-		if (1)
+		if (isset($reference->year) && ($reference->year >= 2013))
+		//if (1)
 		{
 		
 			$epage = '';
@@ -500,13 +523,18 @@ function ris_import($reference)
 						$qualifiers[] = 'spage=' . $values[$count];
 						break;
 						
+					/*
 					case 'jstor':
 						$qualifiers[] = 'doi=' . '"10.2307/' . str_replace('"', '', $values[$count]) . '"';
 						break;
+					*/
 
+					/*
 					case 'epage':
 						$epage = $values[$count];
 						break;
+					*/
+				
 						
 					default:
 						break;
@@ -517,6 +545,15 @@ function ris_import($reference)
 			//print_r($qualifiers);
 			
 			//print_r($reference);
+			
+			if (count($qualifiers) == 3)
+			{
+				$sql = 'UPDATE publications SET jstor="' . str_replace('http://www.jstor.org/stable/', '', $guid)
+					. '" WHERE ' . join(" AND ", $qualifiers) . ';';
+					
+				echo $sql . "\n";
+			}
+			
 			
 			if (count($qualifiers) == 4)
 			{
@@ -530,8 +567,8 @@ function ris_import($reference)
 				}
 			*/					
 					
-				$sql = 'UPDATE publications SET jstor=' .str_replace('http://www.jstor.org/stable/', '', $guid)
-					. ' WHERE ' . join(" AND ", $qualifiers) . ';';
+				$sql = 'UPDATE publications SET jstor="' .str_replace('http://www.jstor.org/stable/', '', $guid)
+					. '" WHERE ' . join(" AND ", $qualifiers) . ';';
 
 				
 				if ($epage != '')
