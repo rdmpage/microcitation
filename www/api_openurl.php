@@ -21,7 +21,7 @@ require_once(dirname(__FILE__) . '/api_utils.php');
 
 
 //----------------------------------------------------------------------------------------
-$db = NewADOConnection('mysql');
+$db = NewADOConnection('mysqli');
 $db->Connect("localhost", 
 	$config['db_user'] , $config['db_passwd'] , $config['db_name']);
 
@@ -40,9 +40,8 @@ function find_from_title (&$openurl_result)
 	
 	$obj = new stdclass;
 	$obj->found = false;
-	$obj->title = $title;
 
-	$sql = 'SELECT guid, doi, title, pdf, url, MATCH (title) AGAINST ("' 
+	$sql = 'SELECT guid, doi, title, pdf, url, handle, MATCH (title) AGAINST ("' 
 		. addcslashes($openurl_result->context_object->referent->title, '"') 
 		. '") AS score FROM publications AS score WHERE MATCH (title) AGAINST ("' 
 		. addcslashes($openurl_result->context_object->referent->title, '"') . '")';
@@ -145,6 +144,153 @@ function find_from_title (&$openurl_result)
 			}	
 			
 			
+		}
+				
+		
+		
+		$result->MoveNext();
+	}
+	
+	$openurl_result->found = count($openurl_result->results) > 0;
+	
+	if ($openurl_result->found)
+	{
+		$openurl_result->status = 200;
+	}
+}
+
+//----------------------------------------------------------------------------------------
+function find_from_keys (&$openurl_result)
+{
+	global $db;
+	
+	$keys = array();
+	
+	if (isset($openurl_result->context_object->referent->journal))
+	{
+		if (isset($openurl_result->context_object->referent->journal->name))
+		{
+			$keys[] = 'journal="' . addcslashes($openurl_result->context_object->referent->journal->name, '"') . '"';
+		}
+
+		if (isset($openurl_result->context_object->referent->journal->identifier))
+		{
+			foreach ($openurl_result->context_object->referent->journal->identifier as $identifier)
+			{
+				if ($identifier->type == 'issn')
+				{
+					$keys[] = 'issn="' . $identifier->id . '"';
+				}
+			}
+		}
+			
+		if (isset($openurl_result->context_object->referent->journal->volume))
+		{
+			$keys[] = 'volume="' . $openurl_result->context_object->referent->journal->volume . '"';
+		}
+
+		if (isset($openurl_result->context_object->referent->journal->pages))
+		{
+			$spage = $openurl_result->context_object->referent->journal->pages;
+			$spage = preg_replace('/--.*/', '', $spage);
+			$keys[] = 'spage="' . $spage . '"';
+		}
+	
+	}
+	
+	//print_r($keys);
+	
+	$obj = new stdclass;
+	$obj->found = false;
+
+	$sql = 'SELECT * FROM publications WHERE ' . join(" AND ", $keys);
+	
+	$openurl_result->sql = $sql;
+
+	$result = $db->Execute($sql);
+	if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
+	
+	//echo '<pre>';
+	//print_r($result);
+	//echo '</pre>';
+	
+	$max_score = 0;
+	
+	while (!$result->EOF) 
+	{
+		$hit = new stdclass;
+	
+		if (isset($result->fields['title']))
+		{
+			$hit->title = $result->fields['title'];
+		}
+	
+		if (isset($result->fields['doi']))
+		{
+			$hit->doi = $result->fields['doi'];
+		}
+		if (isset($result->fields['handle']))
+		{
+			$hit->handle = $result->fields['handle'];
+		}		
+		if (isset($result->fields['jstor']))
+		{
+			$hit->jstor = $result->fields['jstor'];
+		}
+		if (isset($result->fields['pdf']))
+		{
+			$hit->pdf = $result->fields['pdf'];
+		}
+		if (isset($result->fields['url']))
+		{
+			$hit->url = $result->fields['url'];
+		}
+		
+		// check
+		if (isset($hit->title) && isset($openurl_result->context_object->referent->title))
+		{
+			$v1 = finger_print($openurl_result->context_object->referent->title);
+			$v2 = finger_print($hit->title);
+			
+			$hit->fingerprint_query = $v1;
+			$hit->fingerprint_match = $v2;
+			
+			//echo $v1 . '<br>';
+			//echo $v2 . '<br>';
+			
+			//$d = levenshtein($v1, $v2); // not good enough
+			//if ($d <= 5)
+			
+			$lcs = new LongestCommonSequence($v1, $v2);
+			$d = $lcs->score();
+			
+			// echo $d;
+			
+			$score = min($d / strlen($v1), $d / strlen($v2));
+			
+			//echo $score;
+			
+			if ($score >= 0.75)
+			{
+				if ($score > $max_score)
+				{
+					
+					//$hit->levenshtein = $d;			
+
+					$hit->score = $score;
+					$max_score = $score;
+					
+					$openurl_result->results = array();
+					$openurl_result->results[] = $hit;
+				}
+			}	
+			
+			
+		}
+		else
+		{
+			// Just take hit
+			$openurl_result->results[] = $hit;		
 		}
 				
 		
@@ -678,7 +824,11 @@ function main()
 		$openurl_result->debug = new stdclass;
 	}
 	
-	if (isset($openurl_result->context_object->referent->title))
+	// title only versus key-based
+	if (isset($openurl_result->context_object->referent->title)
+		&& (!isset($openurl_result->context_object->referent->journal->volume))
+	
+	)
 	{
 		// approx match on title, with added filters
 		find_from_title($openurl_result);
@@ -686,6 +836,8 @@ function main()
 	else
 	{
 		// key-based search
+		
+		find_from_keys($openurl_result);
 		
 	}
 	
