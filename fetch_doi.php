@@ -13123,6 +13123,8 @@ $dois=array(
 
 $dois=array('10.1051/acarologia/20102013');
 
+$dois=array('10.1080/13235818.2017.1372865');
+
 	$count = 0;
 	foreach ($dois as $doi)
 	{

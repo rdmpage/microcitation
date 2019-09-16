@@ -289,6 +289,15 @@ $sql = 'SELECT * FROM publications WHERE issn="0312-9764" AND volume="9" AND iss
 
 $sql = "SELECT * FROM `publications` where (`publications`.`issn` IN ('0083-7903','1174-0043'))";
 
+// RIS with PDFs for upload to IA
+$sql = 'SELECT * FROM publications WHERE issn="0030-8714" AND pdf IS NOT NULL';
+$sql = 'SELECT * FROM publications WHERE issn="2278-1587" AND pdf IS NOT NULL';
+$sql = 'SELECT * FROM publications WHERE issn="0867-1710" AND pdf IS NOT NULL'; // Genus
+$sql = 'SELECT * from publications where issn="0867-1710" and pdf is not null and internetarchive=""'; // genus extra
+
+$sql = 'SELECT * FROM publications WHERE issn="2278-1587" AND pdf  LIKE "%.pdf.pdf"';
+
+
 
 $sql .= ' ORDER BY CAST(series as SIGNED), CAST(volume as SIGNED), issue, CAST(spage as SIGNED)';
 

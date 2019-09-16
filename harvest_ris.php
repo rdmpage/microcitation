@@ -252,11 +252,11 @@ function ris_import($reference)
 		{
 			if (isset($author->lastname))
 			{
-				$authors[] = $author->lastname . ', ' . $author->firstname;
+				$authors[] = addcslashes($author->lastname . ', ' . $author->firstname, '"');
 			}
 			else
 			{
-				$authors[] = $author->name;
+				$authors[] = addcslashes($author->name, '"');
 			}
 		}
 		if (count($authors) > 0)

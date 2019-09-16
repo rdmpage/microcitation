@@ -882,24 +882,26 @@ $issn = '1514-5158';
 
 $issn = '0037-928X';
 
+$issn = '1323-5818';
+
 
 //for ($y = 1890; $y <= 2018; $y++)
 //for ($y = 2015; $y <= 2015; $y++)
-for ($y = 2008; $y <= 2019; $y++)
+for ($y = 2002; $y <= 2004; $y++)
 {
 	$count = 0;
 	$page = '';
 	$done = false;
 	while (!$done)
 	{
-		$url = 'http://search.crossref.org/dois?q=' . $issn . '&header=true' . '&page=' . $page;
+		$url = 'http://search.crossref.org/dois?q=' . $issn . '&header=true' . '&page=' . $page . '&year=' . $y;
 	
 	//	$url = 'http://search.crossref.org/dois?q=Journal+of+Ornithology&year=1922&publication=Journal+of+Ornithology' . '&header=true' . '&page=' . $page;
 	
 	
 		//$url = 'http://search.crossref.org/dois?q=' . $issn . '&header=true' . '&page=' . $page . '&year=2011&volume=15';
 	
-		$url = 'http://search.crossref.org/dois?q=' . urlencode('Bulletin de la Société entomologique de France') . '&header=true' . '&page=' . $page . '&year=' . $y; 
+		//$url = 'http://search.crossref.org/dois?q=' . urlencode('Bulletin de la Société entomologique de France') . '&header=true' . '&page=' . $page . '&year=' . $y; 
 	
 	
 		//$url = 'http://search.crossref.org/dois?q=Telopea&year=1922&publication=Telopea' . '&header=true' . '&page=' . $page . '&year=' . $y; 
@@ -1030,6 +1032,8 @@ for ($y = 2008; $y <= 2019; $y++)
 					//case '0301-2123':
 					
 					case '0008-347X':
+					
+					case '1323-5818':
 					
 						get_meta($doi, $keys, $values);
 						
