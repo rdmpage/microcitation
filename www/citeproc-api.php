@@ -730,7 +730,8 @@ if ($result->NumRows() == 1)
 	}	
 	
 	
-	echo json_encode($c);
+	echo json_encode($c, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
 }
 
 ?>
