@@ -7,6 +7,9 @@ require_once(dirname(dirname(__FILE__)) . '/adodb5/adodb.inc.php');
 require_once(dirname(dirname(__FILE__)) . '/lib.php');
 require_once(dirname(dirname(__FILE__)) . '/reference.php');
 
+require_once('php-json-ld/jsonld.php');
+
+
 //----------------------------------------------------------------------------------------
 function fix_latin1_mangled_with_utf8_maybe_hopefully_most_of_the_time($str)
 {
@@ -555,7 +558,7 @@ if ($result->NumRows() == 1)
 	}	
 	
 
-	if (0)
+	if (1)
 	{
 		echo '<pre>';
 		print_r($reference);
@@ -574,6 +577,42 @@ if ($result->NumRows() == 1)
 		$nt = reference_to_rdf($reference);
 		echo $nt;
 	}
+	
+	if (1)
+	{	
+		/*
+		echo '<pre>';
+		$nt = reference_to_rdf($reference);
+		echo htmlentities($nt);		
+		echo '</pre>';
+		*/
+		
+		$nt = reference_to_rdf($reference);
+
+		$doc = jsonld_from_rdf($nt, array('format' => 'application/nquads'));
+	
+
+		$context = (object)array(
+			'@vocab' => 'http://schema.org/'
+		);
+
+		$compacted = jsonld_compact($doc, $context);
+		
+		$frame = (object)array(
+				'@context' => $context,
+				'@type' => 'http://schema.org/ScholarlyArticle'
+			);
+			
+
+			$data = jsonld_frame($doc, $frame);		
+	
+		//print_r($compacted);
+
+		echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+		echo "\n";
+		
+	}	
 
 	
 }
