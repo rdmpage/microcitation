@@ -294,8 +294,52 @@ $sql = 'SELECT * FROM publications WHERE issn="0030-8714" AND pdf IS NOT NULL';
 $sql = 'SELECT * FROM publications WHERE issn="2278-1587" AND pdf IS NOT NULL';
 $sql = 'SELECT * FROM publications WHERE issn="0867-1710" AND pdf IS NOT NULL'; // Genus
 $sql = 'SELECT * from publications where issn="0867-1710" and pdf is not null and internetarchive=""'; // genus extra
-
 $sql = 'SELECT * FROM publications WHERE issn="2278-1587" AND pdf  LIKE "%.pdf.pdf"';
+
+$sql = 'SELECT * from publications INNER JOIN sha1 USING (pdf) where issn="0024-1652" AND internetarchive IS NULL';
+
+$sql = 'SELECT * from publications INNER JOIN sha1 USING (pdf) where issn="0166-5189" AND internetarchive IS NULL';
+
+$sql = 'SELECT * from publications  where issn="0005-6219" AND internetarchive IS NULL';
+
+$sql = 'SELECT * FROM publications  WHERE issn="0217-2445" AND volume LIKE "Supplement%" AND pdf IS NOT NULL AND spage IS NOT NULL';
+
+
+//$sql .= ' AND year="2004"';
+
+/*
+$sql = 'SELECT  title, authors, journal, issn, series, volume, issue, spage, epage, year, doi, handle, url, pdf, sha1, updated 
+FROM publications INNER JOIN sha1 USING(pdf) 
+WHERE journal="Bulletin of the Osaka Museum of Natural History"';
+*/
+
+//$sql = 'SELECT * FROM publications WHERE issn="0370-047X" AND guid LIKE "http://search.informit.com.au%"';
+//$sql = 'SELECT * FROM publications WHERE issn="0370-047X" AND volume="133"';
+
+//$sql = 'SELECT * FROM publications WHERE issn="0370-047X" AND volume IN (96, 97,98,99,100,101)';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0031-1847"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0035-9211" AND volume=103';
+
+// 0300-5488
+// 0370-7504
+$sql = 'SELECT * FROM publications WHERE issn="0370-7504"';
+
+$sql = 'SELECT * FROM publications WHERE pdf In ("http://revistas.unne.edu.ar/index.php/bon/article/download/1438/1209","http://revistas.unne.edu.ar/index.php/bon/article/download/1251/1034")';
+
+$sql = 'SELECT * FROM publications WHERE issn="1853-8460" AND volume="13"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0375-0183"';
+
+// Taiwania
+$sql = 'SELECT * FROM publications WHERE issn="0372-333X" AND spage IS NOT NULL AND volume IS NOT NULL and pdf IS NOT NULL';
+
+$sql .= ' AND volume IN (50,51)';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="1447-2546" AND volume IN (68, 69,70,71)';
 
 
 
@@ -327,6 +371,7 @@ while (!$result->EOF)
 		switch ($k)
 		{
 			case 'authors':
+			//echo $v . "\n";
 				if ($v != '')
 				{
 					$authors = preg_split("/;/u", $v);
@@ -350,6 +395,21 @@ while (!$result->EOF)
 					}
 				break;
 				
+			case 'sha1':
+				// http://bionames.org/bionames-archive/pdf/ad/b5/d6/adb5d616e36dd2489bc2fc4eff2f3c878f29d8e1/adb5d616e36dd2489bc2fc4eff2f3c878f29d8e1.pdf
+				$pdf = 'http://bionames.org/bionames-archive/pdfstore?sha1=' . $v;				
+				$ris .= "L1  - " . $pdf . "\n";				
+				break;
+				
+			case 'pdf':
+				if ($result->fields['sha1'] == '')
+				{
+					$ris .= $field_to_ris_key[$k] . "  - " . $v . "\n";
+				}
+				break;
+			
+			
+				
 			default:
 				if ($v != '')
 				{
@@ -365,7 +425,7 @@ while (!$result->EOF)
 								$v .= ' series ' . $result->fields['series'];
 							}
 						}
-					
+						
 					
 						$ris .= $field_to_ris_key[$k] . "  - " . $v . "\n";
 					}

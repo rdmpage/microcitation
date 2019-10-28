@@ -56,12 +56,19 @@ function get_meta($doi, &$keys, &$values)
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
 						break;
 						
-					/*
+					case 'citation_title':
+						$keys[] = 'title';
+						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
+						break;
+					
+						
+						
+					
 					case 'citation_volume':
 						$keys[] = 'volume';
 						$values[] = "'" . addcslashes($meta->content, "'") . "'";	
 						break;
-					*/
+					
 					/*					
 					case 'citation_abstract_html_url':
 						$keys[] = 'url';
@@ -883,11 +890,12 @@ $issn = '1514-5158';
 $issn = '0037-928X';
 
 $issn = '1323-5818';
+$issn = '0031-5850';
 
 
 //for ($y = 1890; $y <= 2018; $y++)
 //for ($y = 2015; $y <= 2015; $y++)
-for ($y = 2002; $y <= 2004; $y++)
+for ($y = 2018; $y <= 2019; $y++)
 {
 	$count = 0;
 	$page = '';
@@ -952,7 +960,7 @@ for ($y = 2002; $y <= 2004; $y++)
 			  $params[$key][] = trim(urldecode($value));
 			}
 		
-			if (1)
+			if (0)
 			{
 				// Update
 				
@@ -999,9 +1007,12 @@ for ($y = 2002; $y <= 2004; $y++)
 					}
 				}
 				else
-				{
-					$keys[] = 'title';
-					$values[] = "'" . addcslashes($params['rft.atitle'][0], "'") . "'";
+				{					
+					if (isset($params['rft.atitle'][0]) && $params['rft.atitle'][0] != '')
+					{
+						$keys[] = 'title';
+						$values[] = "'" . addcslashes($params['rft.atitle'][0], "'") . "'";
+					}
 				}
 			
 				$keys[] = 'journal';
@@ -1244,7 +1255,7 @@ for ($y = 2002; $y <= 2004; $y++)
 								$cols[$keys[$i]] = preg_replace('/\'$/', '', $cols[$keys[$i]]);
 								$cols[$keys[$i]] = preg_replace("/\\\'/", "'", $cols[$keys[$i]]);
 								break;
-							
+								
 							default:
 								$cols[$keys[$i]] = $values[$i];
 							

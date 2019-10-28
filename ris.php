@@ -480,6 +480,7 @@ function import_ris($ris, $callback_func = '')
 		if (isset($key) && ($key == 'ER'))
 		{
 			$state = 0;
+			
 						
 			// Cleaning...						
 			if ($debug)

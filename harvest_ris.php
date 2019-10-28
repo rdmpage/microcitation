@@ -10,6 +10,13 @@ function ris_import($reference)
 {
 	//print_r($reference);
 	
+	if (isset($reference->journal) && isset($reference->pages))
+	{
+		$reference->journal->pages .= $reference->pages; 
+		unset($reference->pages);
+	}
+	
+	
 	
 	// post processing
 	if (preg_match('/s(?<series>\d+)-(?<volume>\d+)/', $reference->journal->volume, $m))
@@ -242,9 +249,10 @@ function ris_import($reference)
 		}
 	}	
 	
+	
+	
 	//print_r($reference);
-	
-	
+		
 	$authors =  array();
 	if (isset($reference->author))
 	{
