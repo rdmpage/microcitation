@@ -296,6 +296,8 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 				case 'internetarchive':
 					$citeproc_obj['ARCHIVE'] = $identifier->id;
 					$citeproc_obj['alternative-id'][] = $identifier->id;
+										
+					$citeproc_obj['thumbnailUrl'] = 'https://archive.org/services/img/' . $identifier->id;
 					break;
 					
 				case 'isbn':

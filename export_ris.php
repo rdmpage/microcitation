@@ -336,11 +336,23 @@ $sql = 'SELECT * FROM publications WHERE issn="0375-0183"';
 // Taiwania
 $sql = 'SELECT * FROM publications WHERE issn="0372-333X" AND spage IS NOT NULL AND volume IS NOT NULL and pdf IS NOT NULL';
 
-$sql .= ' AND volume IN (50,51)';
+// -- 0495-3843
+$sql = 'SELECT * FROM publications WHERE issn="0495-3843" AND spage IS NOT NULL AND volume IS NOT NULL and pdf IS NOT NULL';
+
+//$sql .= ' AND volume IN (50,51)';
 
 
-$sql = 'SELECT * FROM publications WHERE issn="1447-2546" AND volume IN (68, 69,70,71)';
+//$sql = 'SELECT * FROM publications WHERE issn="1447-2546" AND volume IN (68, 69,70,71)';
 
+// bulletin of botanical research harbin 植物研究
+$sql = 'SELECT * from publications INNER JOIN sha1 USING (pdf) where issn="1673-5102" AND internetarchive IS NULL AND spage IS NOT NULL AND volume IS NOT NULL and pdf IS NOT NULL';
+
+//$sql .= ' AND pdf="http://bbr.nefu.edu.cn/CN/article/downloadArticleFile.do?attachType=PDF&id=3754"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0006-5196" AND spage IS NOT NULL AND volume IS NOT NULL and pdf IS NOT NULL';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0035-922X" AND volume < 78';
 
 
 $sql .= ' ORDER BY CAST(series as SIGNED), CAST(volume as SIGNED), issue, CAST(spage as SIGNED)';

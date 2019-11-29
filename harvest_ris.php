@@ -419,7 +419,8 @@ function ris_import($reference)
 	// Add data to existing record
 	if (0) 	
 	{
-		if ($reference->year >= 2000) 
+		//if ($reference->year >= 2000) 
+		if (1)
 		{
 		
 			$qualifiers = array();
