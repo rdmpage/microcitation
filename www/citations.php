@@ -74,12 +74,16 @@ while (!$result->EOF)
 	{
 		$reference->DOI = strtolower($result->fields['doi']);
 	}
+	
+	if ($result->fields['rdmp_doi'] != '')
+	{
+		$reference->DOI = strtolower($result->fields['rdmp_doi']);
+	}
 
 	if ($result->fields['unstructured'] != '')
 	{
 		$reference->unstructured = $result->fields['unstructured'];
 	}
-
 
 	if ($result->fields['article-title'] != '')
 	{
@@ -89,6 +93,16 @@ while (!$result->EOF)
 	if ($result->fields['journal-title'] != '')
 	{
 		$reference->{'journal-title'} = $result->fields['journal-title'];
+	}
+	
+	if ($result->fields['volume-title'] != '')
+	{
+		$reference->{'volume-title'} = $result->fields['volume-title'];
+	}
+
+	if ($result->fields['series-title'] != '')
+	{
+		$reference->{'series-title'} = $result->fields['series-title'];
 	}
 	
 	if ($result->fields['issn'] != '')
@@ -115,8 +129,6 @@ while (!$result->EOF)
 	{
 		$reference->year = $result->fields['year'];
 	}
-	
-
 
 	$citeproc_obj['reference'][] = $reference;
 
