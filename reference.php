@@ -2,6 +2,8 @@
 
 // bibliographic reference
 
+require_once('sici.php');
+
 //--------------------------------------------------------------------------------------------------
 /**
  * @brief Get identifiers for a reference
@@ -233,12 +235,14 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 				$citeproc_obj['page-first'] = $reference->journal->pages;
 			}
 
-			if (preg_match('/(?<spage>\d+)-(?<epage>\d+)/', $reference->journal->pages, $m))
+			if (preg_match('/(?<spage>\d+)--(?<epage>\d+)/', $reference->journal->pages, $m))
 			{
 				$citeproc_obj['page-first'] = $m['spage'];
 			}
 			
 		}
+		
+		
 		
 		if (isset($reference->journal->identifier))
 		{
@@ -278,9 +282,19 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 		{
 			switch ($identifier->type)
 			{
+				case 'bhlpart':
+					$citeproc_obj['BHLPART'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'BHLPART:' . $identifier->id;
+					break;			
+			
 				case 'cinii':
 					$citeproc_obj['CINII'] = $identifier->id;
 					$citeproc_obj['alternative-id'][] = 'CINII:' . $identifier->id;
+					break;
+
+				case 'cnki':
+					$citeproc_obj['CNKI'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'CNKI:' . $identifier->id;
 					break;
 			
 				case 'doi':
@@ -331,6 +345,19 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 					$citeproc_obj['alternative-id'][] = $identifier->id;
 					break;
 					
+				case 'sici':
+					$citeproc_obj['SICI'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'SICI:' . $identifier->id;
+					break;
+					
+				case 'wayback':
+					$citeproc_obj['WAYBACK'] = $identifier->id;
+					break;					
+										
+				case 'zoobank':
+					$citeproc_obj['ZOOBANK'] = $identifier->id;
+					break;
+
 				case 'zenodo':
 					$citeproc_obj['ZENODO'] = $identifier->id;
 					break;
@@ -437,9 +464,12 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 		$citeproc_obj['thumbnail'] = $reference->thumbnail;
 	}
 
-	if (isset($reference->thumbnailUrl))
+	if (isset($reference->license))
 	{	
-		$citeproc_obj['thumbnailUrl'] = $reference->thumbnailUrl;
+		$license = new stdclass;
+		$license->URL = $reference->license;
+	
+		$citeproc_obj['license'][] = $license;
 	}
 	
 	
@@ -719,8 +749,137 @@ function reference_to_ris($reference)
 }
 
 //--------------------------------------------------------------------------------------------------
+// Generate a SICI for a reference
 function reference_to_sici($reference)
 {
+	$sici_string = '';
+	
+	$sici = array();
+	
+	$ok = true;
+	
+	//------------------------------------------------------------------------------------
+	if (!isset($reference->journal))
+	{
+		$ok = false;
+	}
+	else
+	{
+		$journal_id = $subject_id . '#container';
+		
+		$issns = array();
+		if (isset($reference->journal->identifier))
+		{
+			foreach ($reference->journal->identifier as $identifier)
+			{
+				switch ($identifier->type)
+				{
+					case 'issn':
+						$issns[] = $identifier->id;
+						break;
+						
+					default:
+						break;
+				}
+			}
+		}
+		
+		if (count($issns) == 0)
+		{
+			$ok = false;
+		}
+		else
+		{
+			$journal_id = 'http://worldcat.org/issn/' . $issns[0];
+			
+			$sici[] = $issns[0];
+
+			if (isset($reference->year))
+			{
+				$sici[] = '(' . $reference->year . ')';
+			}
+		}
+		
+		if ($ok && isset($reference->journal->volume))
+		{
+			$sici[] = $reference->journal->volume;
+		}
+		else
+		{
+			$ok = false;
+		}
+		
+		/*
+		if (isset($reference->journal->issue))
+		{
+		}
+		*/
+		
+		if ($ok && isset($reference->journal->pages))
+		{
+			if (preg_match('/(?<spage>[a-z]?\d+)/', $reference->journal->pages, $m))
+			{
+				$sici[] = '<';
+				$sici[] =  $m['spage'];
+			}
+			else
+			{
+				$ok = false;
+			}
+			
+			if ($ok && isset($reference->title))
+			{
+				$title = $reference->title;
+				
+				//echo $title . "\n";
+				
+				$title = html_entity_decode($title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+				
+				//echo $title . "\n";
+							
+				// Convert accented characters
+				$title = strtr(utf8_decode($title), 
+					utf8_decode("ÀÁÂÃÄÅàáâãäåĀāĂăĄąÇçĆćĈĉĊċČčÐðĎďĐđÈÉÊËèéêëĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħÌÍÎÏìíîïĨĩĪīĬĭĮįİıĴĵĶķĸĹĺĻļĽľĿŀŁłÑñŃńŅņŇňŉŊŋÒÓÔÕÖØòóôõöøŌōŎŏŐőŔŕŖŗŘřŚśŜŝŞşŠšſŢţŤťŦŧÙÚÛÜùúûüŨũŪūŬŭŮůŰűŲųŴŵÝýÿŶŷŸŹźŻżŽž"),
+					"aaaaaaaaaaaaaaaaaaccccccccccddddddeeeeeeeeeeeeeeeeeegggggggghhhhiiiiiiiiiiiiiiiiiijjkkkllllllllllnnnnnnnnnnnoooooooooooooooooorrrrrrsssssssssttttttuuuuuuuuuuuuuuuuuuuuwwyyyyyyzzzzzz");
+				
+				$title = strtoupper($title);
+				
+				//echo $title . "\n";
+				
+  				$title = preg_replace('/[^A-Z\s]/', '', $title); 
+  				
+  				//echo $title . "\n";
+  				
+  				//echo "\n\n";
+				
+				$words = explode(' ', $title);
+				$num_words = min(6, count($words));
+				$initials = '';
+				for ($i = 0; $i < $num_words; $i++)
+				{
+					$initials .= $words[$i][0];
+				}
+				
+				$sici[] = ':' . $initials;
+				
+			}
+			
+			$sici[] = '>';
+		}
+		
+	}
+	
+	if ($ok)
+	{
+	
+		$sici_string = join('', $sici);
+	
+		$sici_string .= '2.0.CO;2';
+		$sici_string .= '-' . checksum($sici_string);
+	}	
+	
+	return $sici_string;
+				
 }
 
 
