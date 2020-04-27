@@ -34,6 +34,151 @@ $db->EXECUTE("set names 'utf8'");
 $debug_openurl = true;
 
 //----------------------------------------------------------------------------------------
+function clean_string($str)
+{
+
+	// strip punctuation
+	$str = preg_replace('/[,|\.|\(|\)|-|\[|\]|–|–|&|:]/u', ' ', $str);
+	
+	// Convert accented characters
+	$str = strtr(utf8_decode($str), 
+			utf8_decode("ÀÁÂÃÄÅàáâãäåĀāĂăĄąÇçĆćĈĉĊċČčÐðĎďĐđÈÉÊËèéêëĒēĔĕĖėĘęĚěĜĝĞğĠġĢģĤĥĦħÌÍÎÏìíîïĨĩĪīĬĭĮįİıĴĵĶķĸĹĺĻļĽľĿŀŁłÑñŃńŅņŇňŉŊŋÒÓÔÕÖØòóôõöøŌōŎŏŐőŔŕŖŗŘřŚśŜŝŞşŠšſŢţŤťŦŧÙÚÛÜùúûüŨũŪūŬŭŮůŰűŲųŴŵÝýÿŶŷŸŹźŻżŽž"),
+			"aaaaaaaaaaaaaaaaaaccccccccccddddddeeeeeeeeeeeeeeeeeegggggggghhhhiiiiiiiiiiiiiiiiiijjkkkllllllllllnnnnnnnnnnnoooooooooooooooooorrrrrrsssssssssttttttuuuuuuuuuuuuuuuuuuuuwwyyyyyyzzzzzz");
+	
+
+	$str = preg_replace('/\s\s+/', ' ', $str);
+	$str = preg_replace('/^\s+/', '', $str);
+	$str = preg_replace('/\s+$/', '', $str);
+	
+	return $str;
+}
+
+
+//----------------------------------------------------------------------------------------
+function find_from_citation (&$openurl_result)
+{
+	global $db;
+	
+	$obj = new stdclass;
+	$obj->found = false;
+	
+	$str = clean_string($openurl_result->context_object->referent->dat);
+		
+$sql = 'SELECT guid, target, title, doi, handle, jstor, pdf, url, MATCH (target) AGAINST ("'
+. addcslashes($str, '"')
+. '") AS score FROM publication_search '
+. 'INNER JOIN publications USING(guid) '
+. 'WHERE MATCH (target) AGAINST ("'
+. addcslashes($str, '"') . '")';
+				
+	$sql .= ' ORDER BY score DESC LIMIT 5;';
+
+	$openurl_result->sql = $sql;
+
+	$result = $db->Execute($sql);
+	if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
+	
+	/*
+	echo '<pre>';
+	print_r($result);
+	echo '</pre>';
+	*/
+	
+	$max_score = 0;
+	
+	while (!$result->EOF) 
+	{
+		$hit = new stdclass;
+		
+		if (isset($result->fields['target']))
+		{
+			$hit->unstructured = $result->fields['target'];
+		}			
+		
+		if (isset($result->fields['title']))
+		{
+			$hit->title = $result->fields['title'];
+		}
+	
+		if (isset($result->fields['doi']))
+		{
+			$hit->doi = $result->fields['doi'];
+		}
+		if (isset($result->fields['handle']))
+		{
+			$hit->handle = $result->fields['handle'];
+		}		
+		if (isset($result->fields['jstor']))
+		{
+			$hit->jstor = $result->fields['jstor'];
+		}
+		if (isset($result->fields['pdf']))
+		{
+			$hit->pdf = $result->fields['pdf'];
+		}
+		if (isset($result->fields['url']))
+		{
+			$hit->url = $result->fields['url'];
+		}
+		
+		$hit->guid = $result->fields['guid'];
+		
+		
+		
+		
+		// check
+		if (isset($hit->unstructured))
+		{
+			$v1 = finger_print($str);
+			$v2 = finger_print($hit->unstructured);
+			
+			//echo $v1 . '<br />';
+			
+			$hit->fingerprint_query = $v1;
+			$hit->fingerprint_match = $v2;
+			
+			//$d = levenshtein($v1, $v2); // not good enough
+			//if ($d <= 5)
+			
+			$lcs = new LongestCommonSequence($v1, $v2);
+			$d = $lcs->score();
+			
+			//echo $d;
+			
+			$score = min($d / strlen($v1), $d / strlen($v2));
+			
+			if ($score > 0.6)
+			{
+				if ($score > $max_score)
+				{
+					
+					//$hit->levenshtein = $d;			
+
+					$hit->score = $score;
+					$max_score = $score;
+					
+					$openurl_result->results = array();
+					$openurl_result->results[] = $hit;
+				}
+			}	
+			
+			
+		}
+				
+		
+		
+		$result->MoveNext();
+	}
+	
+	$openurl_result->found = (count($openurl_result->results) == 1) && ($openurl_result->results[0]->score > 0.8);
+	
+	if ($openurl_result->found)
+	{
+		$openurl_result->status = 200;
+	}
+}
+
+//----------------------------------------------------------------------------------------
 function find_from_title (&$openurl_result)
 {
 	global $db;
@@ -824,23 +969,37 @@ function main()
 		$openurl_result->debug = new stdclass;
 	}
 	
-	// title only versus key-based
-	if (isset($openurl_result->context_object->referent->title)
-		&& (!isset($openurl_result->context_object->referent->journal->volume))
-	
-	)
+	if (0)
 	{
-		// approx match on title, with added filters
-		find_from_title($openurl_result);
+		echo '<pre>';
+		print_r($openurl_result);
+		echo '</pre>';
+	}
+	
+	// citation matching
+	if (isset($openurl_result->context_object->referent->dat))
+	{
+		find_from_citation($openurl_result);
 	}
 	else
 	{
-		// key-based search
-		
-		find_from_keys($openurl_result);
-		
-	}
+		// title only versus key-based
+		if (isset($openurl_result->context_object->referent->title)
+			&& (!isset($openurl_result->context_object->referent->journal->volume))
 	
+		)
+		{
+			// approx match on title, with added filters
+			find_from_title($openurl_result);
+		}
+		else
+		{
+			// key-based search
+		
+			find_from_keys($openurl_result);
+		
+		}
+	}
 
 	api_output($openurl_result, $callback);
 	
