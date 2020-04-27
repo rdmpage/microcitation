@@ -25,15 +25,17 @@ function checksum($sici) {
 }
 
 
+// test
+if (0)
+{
 
+	$sici_string = '0095-4403(199502/03)21:3<12:WATIIB>2.0.TX;2-';
+	//$sici_string = '0015-6914(19960101)157:1<62:KTSW>2.0.TX;2-';
 
-$sici_string = '0095-4403(199502/03)21:3<12:WATIIB>2.0.TX;2-';
-//$sici_string = '0015-6914(19960101)157:1<62:KTSW>2.0.TX;2-';
+	$sici_string .= checksum($sici_string);
 
-$sici_string .= checksum($sici_string);
+	echo $sici_string . "\n";
 
-echo $sici_string . "\n";
-
-
+}
 
 ?>
