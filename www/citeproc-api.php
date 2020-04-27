@@ -363,6 +363,14 @@ if ($result->NumRows() == 1)
 		$reference->identifier[] = $identifier;
 	}
 	
+	if ($result->fields['sici'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'sici';
+		$identifier->id = $result->fields['sici'];
+		$reference->identifier[] = $identifier;
+	}	
+	
 	// zootaxa
 	if ($result->fields['zootaxa_url'] != '')
 	{
@@ -391,12 +399,55 @@ if ($result->NumRows() == 1)
 		
 	}	
 	
+	// guid might be useful
+	if ($result->fields['guid'] != '')
+	{
+		// CNKI
+		// http://www.cnki.com.cn/Article/CJFDTOTAL-KCFL199001010.htm
+		if (preg_match('/CJFDTOTAL-(?<id>.*)\.htm/', $result->fields['guid'], $m))
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'cnki';
+			$identifier->id = $m['id'];
+			$reference->identifier[] = $identifier;		
+		}	
+	}
+
+	
 	if ($result->fields['url'] != '')
 	{
-		$link = new stdclass;
-		$link->anchor = 'LINK';
-		$link->url = $result->fields['url'];
-		$reference->link[] = $link;
+		$use_url = true;
+		
+		if (preg_match('/biodiversitylibrary.org\/part\/(?<id>\d+)/', $result->fields['url'], $m))
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'bhlpart';
+			$identifier->id = $m['id'];
+			$reference->identifier[] = $identifier;		
+			
+			$use_url = false;
+		}	
+		
+		// CNKI
+		// http://www.cnki.com.cn/Article/CJFDTOTAL-KCFL199001010.htm
+		if (preg_match('/CJFDTOTAL-([A-Z]+)\.htm/', $result->fields['url'], $m))
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'CNKI';
+			$identifier->id = $m['id'];
+			$reference->identifier[] = $identifier;		
+			
+			$use_url = true;
+		}	
+		
+	
+		if ($use_url)
+		{
+			$link = new stdclass;
+			$link->anchor = 'LINK';
+			$link->url = $result->fields['url'];
+			$reference->link[] = $link;
+		}
 	}	
 	
 	if ($result->fields['pdf'] != '')
@@ -451,11 +502,26 @@ if ($result->NumRows() == 1)
 	// alternative identifiers
 	if ($result->fields['pii'] != '')
 	{
-		$identifier = new stdclass;
-		$identifier->type = 'pii';
-		$identifier->id = $result->fields['pii'];
-		$reference->identifier[] = $identifier;
+		// sometiems we sue this for other stuff!!!!
+		
+		$use_pii = true;
+		
+		if ($result->fields['issn'] == '1000-7482')
+		{
+			$reference->journal->pages = $result->fields['pii'];
+			$use_pii = false;
+		}
+		
+		
+		if ($use_pii)
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'pii';
+			$identifier->id = $result->fields['pii'];
+			$reference->identifier[] = $identifier;
+		}
 	}
+	
 	if ($result->fields['oai'] != '')
 	{
 		$identifier = new stdclass;
@@ -463,6 +529,23 @@ if ($result->NumRows() == 1)
 		$identifier->id = $result->fields['oai'];
 		$reference->identifier[] = $identifier;
 	}
+	
+	if ($result->fields['zoobank'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'zoobank';
+		$identifier->id = $result->fields['zoobank'];
+		$reference->identifier[] = $identifier;
+	}
+	
+	if ($result->fields['waybackmachine'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'wayback';
+		$identifier->id = $result->fields['waybackmachine'];
+		$reference->identifier[] = $identifier;
+	}	
+	
 	
 
 	if ($result->fields['publisher'] != '')
@@ -502,6 +585,11 @@ if ($result->NumRows() == 1)
 	{
 		$reference->thumbnailUrl = $result->fields['thumbnailUrl'];
 	}
+	
+	if ($result->fields['license'] != '')
+	{
+		$reference->license = $result->fields['license'];
+	}	
 
 	// multilingual data
 	
