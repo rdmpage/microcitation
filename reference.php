@@ -197,6 +197,13 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 				$a['literal'] = $author->name;
 				//$a['family'] = $author->name;
 			}
+			
+			if (isset($author->PERSEE))
+			{
+				$a['PERSEE']= $author->PERSEE;
+			}
+			
+			
 
 			if (isset($author->multi))
 			{
