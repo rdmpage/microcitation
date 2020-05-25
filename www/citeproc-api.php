@@ -128,6 +128,7 @@ $db->EXECUTE("set names 'utf8'");
 //--------------------------------------------------------------------------------------------------
 
 $sql = 'SELECT * FROM publications WHERE guid="' . $guid . '"';
+//$sql = 'SELECT * FROM `publications-extra` WHERE guid="' . $guid . '"';
 
 if (!preg_match('/^10\./', $guid))
 {	
@@ -287,6 +288,14 @@ if ($result->NumRows() == 1)
 			}
 		}
 	}	
+	
+	// structured authors (e.g., persee)
+	// authors
+	if ($result->fields['authors_structured'] != '')
+	{
+		$reference->author = json_decode($result->fields['authors_structured']);
+	}
+	
 	
 	// identifiers and links
 	
