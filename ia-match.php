@@ -63,6 +63,7 @@ $json = '{
             
  
 $json = file_get_contents('mosquito_systematics.json');
+$json = file_get_contents('internet-archive/jamca.json');
      
 $doc = json_decode($json);
 
@@ -70,6 +71,8 @@ foreach ($doc->response->docs as $obj)
 {
 	$title = $obj->title;
 	$title = preg_replace('/\.$/u', '', $title);
+	
+	$title = preg_replace('/\[[^\]]+\]/u', '', $title);
 	
 	echo "-- $title\n";
 	
@@ -82,7 +85,9 @@ foreach ($doc->response->docs as $obj)
 	. 'WHERE MATCH (title) AGAINST ("'
 	. addcslashes($title, '"') . '") '
 	. ' AND volume=' . $volume
-	. ' AND issn="0091-3669"';
+	. ' AND year=' . $year
+//	. ' AND issn="0091-3669"';
+	. ' AND issn="8756-971X"';
 				
 	$sql .= ' ORDER BY score DESC LIMIT 5;';
 	
