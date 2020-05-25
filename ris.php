@@ -41,7 +41,9 @@ $key_map = array(
 	'L1' => 'pdf', 
 	'N1' => 'notes',
 	'L2' => 'fulltext', // check this, we want to have a link to the PDF...
-	'DO' => 'doi' // Mendeley 0.9.9.2
+	'DO' => 'doi', // Mendeley 0.9.9.2
+	
+	'XM' => 'xml', // I made this key up!
 	);
 	
 //--------------------------------------------------------------------------------------------------
@@ -361,6 +363,7 @@ function process_ris_key($key, $value, &$obj)
 			$link->anchor = 'PDF';
 			$obj->link[] = $link;
 			break;
+			
 
 		case 'UR':
 			
@@ -423,7 +426,14 @@ function process_ris_key($key, $value, &$obj)
 
 		case 'ID':
 			$obj->publisher_id = $value;
-			break;			
+			break;	
+			
+		case 'XM':
+			$link = new stdclass;
+			$link->url = $value;
+			$link->anchor = 'XML';
+			$obj->link[] = $link;
+			break;
 			
 		default:
 			break;
