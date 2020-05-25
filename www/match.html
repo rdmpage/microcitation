@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	
+		<meta charset="utf-8" /> 
+		
+   		<!-- favicon -->
+		<link href="static/biostor-shadow32x32.png" rel="icon" type="image/png">    
+		
+		<title>
+			Match references 
+		</title>
+		<style>
+	
+	/* body and main styles to give us a fixed footer, see https://materializecss.com/footer.html */	
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }	
+
+	</style>
+	
+	<!--Let browser know website is optimized for mobile-->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+	
+	<!--Import Google Icon Font-->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> 
+	
+	<!-- local --->
+	<script src="js/jquery.js"></script> 
+	<link rel="stylesheet" type="text/css" href="css/materialize.min.css"> 
+	<script type="text/javascript" src="js/materialize.min.js"></script>
+		
+	
+	<script>
+
+		
+		function reconcile_many() {
+			var string = $('#multiple').val();
+			
+			string = string.replace(/\s+$/, '');
+			string = string.replace(/\t/g, '');
+			
+			var rows = string.split("\n");
+			
+			var query = {};
+			
+			var html = '';
+			html += '<table>';
+			html += '<tr><th>Query</th><th>Matched</th><th>Identifier</th><th>Score</th></tr>';
+			
+			for (var i in rows) {
+				var key = 'q' + i;
+				query[key] = {};
+				
+				var text = rows[i];
+				text = text.replace(/:/g, '');
+				text = text.replace(/"/g, '');
+				
+				query[key].query = text;
+				query[key].limit = 3;
+				
+				html += '<tr>';
+				
+				html += '<td id="' + key + '" width="50%">' + rows[i] + '</td>';
+				html += '<td id="' + key + '_name"></td>';
+				html += '<td id="' + key + '_id"></td>';
+				html += '<td id="' + key + '_score"></td>';
+
+				html += '</tr>';
+			}
+			
+			html += '</table>';
+			
+			$('#results').html(html);
+			
+			$('#json_query').text(JSON.stringify(query, null, 2));
+			$('#json_result').text('working...');
+			
+			
+			
+//			$.getJSON('http://localhost/~rpage/kg/reconciliation/reconciliation_crossref.php?queries=' 
+//			$.getJSON('http://localhost/~rpage/biostor/api_reconciliation.php?queries='			
+//			$.getJSON('http://bionames.org/api/api_reconciliation.php?queries='			
+//				+ encodeURIComponent(JSON.stringify(query)) + '&callback?',
+				
+			var url = '';
+			
+			//url = 	'http://localhost/~rpage/biostor/api_reconciliation.php?queries='	
+			//url = 	'http://localhost/~rpage/biostor/reconcile?queries='	
+			url = 	'api_reconciliation.php?queries='	
+			//url = 	'http://direct.bionames.org/api/api_reconciliation.php?queries='	
+			//url = 'http://localhost/~rpage/kg/reconciliation/reconciliation_crossref.php?queries=' 
+			  + encodeURIComponent(JSON.stringify(query)) + '&callback?';
+
+			/*
+			url = 	'http://bionames.org/api/api_reconciliation.php?queries='	
+			  + encodeURIComponent(JSON.stringify(query)) + '&callback?';
+			*/
+
+			$.getJSON(url + encodeURIComponent(url),				
+				
+			//$.getJSON('http://localhost/~rpage/proxy.php?url=' + encodeURIComponent(url),				
+			//$.getJSON('https://crossorigin.me/' + encodeURIComponent(url),				
+				function(data) {
+					$('#json_result').text(JSON.stringify(data,null,2));
+				
+									
+					for (var i in data) {
+						if (data[i].result) {
+							
+					   		for (var j in data[i].result) {
+					   			$('#' + i + '_name').html(data[i].result[j].name);
+					   			$('#' + i + '_id').html(data[i].result[j].id);
+					   			$('#' + i + '_score').html(data[i].result[j].score);
+					   		}
+					   } else {
+					   	// not found
+					   	$('#' + i + '_id').html('-');
+						}
+					}
+				}
+			);
+			
+			
+		
+		
+		}
+		
+	
+	
+	</script>
+</head>
+<body>
+	<header></header>
+	<main>
+		<div class="container">
+			<div class="row">
+
+	<h3>Match references</h3>
+	<p>Tool to explore BioStor's <a href="reconcile">reconciliation service</a>. This service is based on the Freebase 
+	reconciliation service used by tool such as OpenRefine, see <a href="https://github.com/OpenRefine/OpenRefine/wiki/Reconciliation-Service-API">Reconciliation Service API</a>.
+	To use this tool, paste references, one per line into the box below, click "Reconcile" and 
+	the service will attempt to match those references to records in BioStor.</p>
+	
+	<!--
+	<div>
+		<h2>Single query</h2>
+		<input type="text" id="query" value="Romero et al. 2009. The hypogean fihes of China. Environmental Biology of Fishes 86:211-278" placeholder="string" style="width:80%;font-size:1.5em;">
+		<button onclick="reconcile_one();"></button>	
+		
+		<div id="result"></div>
+	</div>
+	-->
+	
+	<div>
+		<div class="input-field col s12">
+		<textarea  class="materialize-textarea" id="multiple" rows="10" style="width:100%;font-size:1em;">
+Otto, J.C.  Hill, D.E. (2012a) Notes on Maratus Karsch 1878 and related jumping spiders from Australia, with five new  species (Araneae: Salticidae: Euophryinae). Peckhamia, 103 (1), 1‒81
+		</textarea>
+		   <label for="multiple">Enter references, one per line</label>
+        </div>
+		
+		<button style="font-size:1.5em;" onclick="reconcile_many();">Match</button>	
+		<hr />
+		<div>
+			<div id="json_query" style="background:rgb(64,64,64);color:rgb(200,200,200);width:48%;float:left;font-size:12px;height:200px;overflow:auto;white-space:pre;border: 1px solid rgb(192,192,192)"></div>
+		
+			<div id="json_result" style="background:rgb(64,64,64);color:rgb(200,200,200);width:48%;float:right;font-size:12px;height:200px;overflow:auto;white-space:pre;border: 1px solid rgb(192,192,192)"></div>
+		</div>
+		<div style="clear:both;"></div>
+		<div id="results"></div>
+	
+	</div>
+	
+		
+
+		</div>
+		</div>
+	</main>
+	
+	
+		<footer >
+			<div class="container">
+            	<div class="row">
+            	<div class="divider"></div>
+            		<a href=".">BioStor-Lite</a> is a project by <a href="https://twitter.com/rdmpage">Rod Page</a>. It's goal is to make discoverable articles in the <a href="https://www.biodiversitylibrary.org">Biodiversity Heritage Library</a> (BHL).
+            	</div>
+            </div>
+			
+		
+		</footer>
+	
+	
+</body>
+</html>

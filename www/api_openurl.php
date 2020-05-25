@@ -170,7 +170,7 @@ $sql = 'SELECT guid, target, title, doi, handle, jstor, pdf, url, MATCH (target)
 		$result->MoveNext();
 	}
 	
-	$openurl_result->found = (count($openurl_result->results) == 1) && ($openurl_result->results[0]->score > 0.8);
+	$openurl_result->found = (count($openurl_result->results) == 1) && ($openurl_result->results[0]->score > 0.7);
 	
 	if ($openurl_result->found)
 	{

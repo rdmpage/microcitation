@@ -3,7 +3,7 @@
 // Base class for Google Refine reconciliation service
 // http://code.google.com/p/google-refine/wiki/ReconciliationServiceApi
 
-require_once (dirname(__FILE__) . '/lib.php');
+require_once (dirname(dirname(__FILE__)) . '/lib.php');
 
 //--------------------------------------------------------------------------------------------------
 class ReconciliationService
