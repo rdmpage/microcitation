@@ -15,3 +15,6 @@ junk
 www/.DS_Store
 
 *.sql
+search.tsv
+mosquito_systematics.json
+files.txt
