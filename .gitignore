@@ -18,3 +18,5 @@ www/.DS_Store
 search.tsv
 mosquito_systematics.json
 files.txt
+
+/vendor/

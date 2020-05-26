@@ -1,0 +1,12 @@
+{
+    "name": "rpage/microcitation",
+    "require": {
+        "patrickschur/language-detection": "^3.4"
+    },
+    "authors": [
+        {
+            "name": "Roderic Page",
+            "email": "rdmpage@gmail.com"
+        }
+    ]
+}
