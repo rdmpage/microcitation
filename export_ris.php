@@ -354,8 +354,182 @@ $sql = 'SELECT * FROM publications WHERE issn="0006-5196" AND spage IS NOT NULL 
 
 $sql = 'SELECT * FROM publications WHERE issn="0035-922X" AND volume < 78';
 
+$sql = 'SELECT * FROM publications WHERE issn="0161-8202" AND volume = 45';
 
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0971-2313" AND spage IS NOT NULL AND volume IS NOT NULL and pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0080-9462" and pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0077-1813" and year=2004';
+
+$sql = 'SELECT * FROM publications WHERE issn="0385-2423" and pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0077-1813" and volume IN (21, 22,23,24)';
+
+$sql = 'SELECT * FROM publications WHERE issn="0077-1813" and volume IN (26,28,29)';
+
+//$sql = 'SELECT * FROM publications WHERE issn="0038-3872"';
+
+$sql = 'select * from publications where issn="0778-9386" and volume=33';
+
+$sql = 'SELECT * FROM publications WHERE issn="0035-9181"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0375-099X"';
+
+$sql = 'SELECT * FROM publications WHERE issn="1176-6166" and pdf is not null AND spage IS NOT NULL AND (authors IS NOT NULL OR title LIKE "%obituary%")';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0077-1813" and volume IN (31,32)';
+
+$sql = 'SELECT * FROM publications WHERE issn="0068-547X" AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0524-4994" AND pdf IS NOT NULL';
+
+$sql = 'select * from publications where issn = "0068-547X" and internetarchive is not null and internetarchive like "%,%"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0067-4745" AND pdf IS NOT NULL';
+$sql = 'SELECT * FROM publications WHERE issn="0067-8546" AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="1026-3632" AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0312-3162" and volume=24 and guid like "10%"';
+
+$sql = 'SELECT * FROM publications WHERE guid IN (
+"10.18195/issn.0312-3162.24(1).2007.065-079",
+"http://www.museum.wa.gov.au/sites/default/files/A NEW GENUS AND SPECIES OF STYGOBITIC PARAMELITID AMPHIPOD FROM THE PILBARA, WESTERN AUSTRALIA.pdf",
+"http://www.museum.wa.gov.au/sites/default/files/A NEW SPECIES OF THE FRESHWATER TANAIDACEAN GENUS PSEUDOHALMYRAPSEUDES (CRUSTACEA TANAIDACEA PARAPSEUDIDAE) FROM SULAWESI.pdf",
+"http://www.museum.wa.gov.au/sites/default/files/A NEW SPECIES OF THE GENUS CANDONOPSIS (CRUSTACEA, OSTRACODA) FROM WESTERN AUSTRALIA.pdf",
+"http://www.museum.wa.gov.au/sites/default/files/A NEW SPIDER WASP FROM WESTERN AUSTRALIA, WITH A DESCRIPTION OF THE FIRST KNOWN MALE OF THE GENUS EREMOCURGUS (HYMENOPTERA .pdf",
+"http://www.museum.wa.gov.au/sites/default/files/CALLUCINA AND PSEUDOLUCINISCA (MOLLUSCA BIVALVIA LUCINIDAE) FROM A AUSTRALIA REVISION OF GENERAAND DESCRIPTION OF THREE NEW.pdf",
+"http://www.museum.wa.gov.au/sites/default/files/GUNAWARDENEA, NEW GENUS OF SQUAT LEAFHOPPERS FROM WESTERN AUSTRALIA, WITH DESCRIPTION OF TWO NEW SPECIES (HEMIPTERA CICADEL.pdf",
+"http://www.museum.wa.gov.au/sites/default/files/PHREODRILIDAE (CLITELLATA ANNELIDA) IN NORTH-WESTERN AUSTRALIA WITH DESCRIPTIONS OF TWO NEW SPECIES.pdf",
+"http://www.museum.wa.gov.au/sites/default/files/SPECIES OF THJE SPONGE GENUS CHONDRILLA (DEMOSPONGIAE CHONDROSIDA CHONDRILLIDAE) IN AUSTRALIA.pdf"
+
+)';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0252-192X" AND pdf IS NOT NULL';
+
+
+// Melbourne Museum journals
+$sql = 'SELECT * FROM publications WHERE issn IN ("1447-2546", "0814-1827", "0083-5986", "0311-9548") AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0031-1847" AND pdf IS NOT NULL AND spage IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0387-5733" AND pdf IS NOT NULL AND spage IS NOT NULL AND guid LIKE "http://%"';
+
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0155-4131" AND pdf IS NOT NULL AND spage IS NOT NULL';
+
+$sql = 'SELECT * FROM `publications` WHERE issn="1576-9518" AND pdf IS NOT NULL AND spage IS NOT NULL';
+
+$sql = 'select * from publications where issn="0385-2423" and pdf is not null and internetarchive is null';
+
+
+
+$sql = 'select * from publications where issn="0034-365X" and pdf is not null';
+
+//$sql = 'select * from publications where guid IN ("2246/1634")';
+
+//$sql = 'select * from publications where issn="0001-804X" and volume=4 and issue=2';
+
+$sql = 'select * from publications where issn="0034-365X" and 
+(pdf like "%88/91"
+or pdf like "%87/90"
+or pdf like "%86/89"
+or pdf like "%85/88"
+or pdf like "%85/88"
+or pdf like "%84/87"
+or pdf like "%83/86"
+or pdf like "%78/81"
+or pdf like "%76/79"
+or pdf like "%50/54")';
+
+$sql = 'select * from publications where issn="0034-365X" and 
+(pdf like "%268/805"
+or pdf like "%245/663")'
+;
+
+
+$sql = 'select * from publications where issn="2337-8824" and internetarchive is null';
+
+
+$sql = 'select * from publications where issn="0723-4244" and pdf is not null';
+
+// 0001-804X
+$sql = 'select * from publications where issn="1872-9231"';
+
+$sql = 'SELECT * FROM publications where issn="2357-3759" and pdf is not null';
+
+$sql = 'select * from publications where pdf="http://hbs.bishopmuseum.org/pubs-online/pdf/iom8-2p13-33.pdf"';
+
+$sql = 'select * from publications where journal="The Bulletin of The Raffles Museum"';
+
+
+$sql = 'select * from publications where issn="0022-2062" and volume is not null and spage is not null and pdf LIKE "http://www.jjbotany.com/getpdf.php?tid%"';
+
+//$sql .= ' AND updated > "2020-06-03"';
+
+
+$sql = 'SELECT * FROM publications where issn="0368-0177" and pdf is not null and spage is not null';
+
+
+$sql = 'select * from publications where journal="Abhandlungen Aus Dem Gebiete Der Naturwissenschaften Hamburg" and pdf is not null';
+
+//$sql = 'SELECT * FROM publications where guid="http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/77-sup-2-2007"';
+
+//$sql = 'SELECT * FROM publications where guid IN ("http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/48-1972/biologie-1972-48-2-_1-7.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/48-1972/biologie-1972-48-11-_1-7.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/48-1972/biologie-1972-48-12-_1-7.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/48-1972/biologie-1972-48-4-_1-14.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/48-1972/biologie-1972-48-9-_1-14.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/49-1973/biologie-1973-49-3-_1-13.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/49-1973/biologie-1973-49-9-_1-13.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/49-1973/biologie-1973-49-13-_1-13.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/49-1973/biologie-1973-49-5-_1-10.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/49-1973/biologie-1973-49-12-_1-10.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/50-1974/biologie-1974-50-4-_1-9.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/50-1974/biologie-1974-50-7-_1-9.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/51-1975-1979/biologie-1975-1979-51-1-_1-6.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/51-1975-1979/biologie-1975-1979-51-3-_1-5.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/51-1975-1979/biologie-1975-1979-51-5-_1-14.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/51-1975-1979/biologie-1975-1979-51-9-_1-14.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-3-_1-3.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-8-_1-3.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-9-_1-9.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-19-_1-9.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-14-_1-8.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-18-_1-8.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-20-_1-8.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-15-_1-12.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/52-1980/biologie-1980-52-16-_1-12.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/53-1981/biologie-1981-53-5-_1-3.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/53-1981/biologie-1981-53-11-_1-3.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/53-1981/biologie-1981-53-7-_1-14.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/53-1981/biologie-1981-53-12-_1-14.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/53-1981/biologie-1981-53-10-_1-4.pdf","http://biblio.naturalsciences.be/rbins-publications/bulletin-of-the-royal-belgian-institute-of-natural-sciences-biologie/53-1981/biologie-1981-53-15-_1-4.pdf")';
+
+$sql = 'SELECT * FROM publications where issn="0001-804X" and volume=6';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0155-4131" AND spage IS NOT NULL AND volume > 4';
+
+
+$sql = 'SELECT * FROM publications where issn="0723-9912" and pdf is not null and spage is not null';
+
+
+$sql = 'SELECT * FROM publications where issn = "0085-4417" and pdf is not null and spage is not null';
+
+$sql = 'SELECT * FROM publications WHERE issn="0037-2870" and pdf is not null and spage is not null';
+
+$sql = 'SELECT * FROM publications WHERE issn="0001-5202" and pdf is not null and spage is not null';
+
+$sql = 'SELECT * FROM publications WHERE journal="Insects of Hawaii"';
+
+$sql = 'SELECT * FROM publications where issn="0079-8835" and volume=60 and spage IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0723-9319"';
+
+$sql = 'SELECT * FROM publications_amnh WHERE guid="2246/1135"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0312-9764" AND year IN (2012, 2013,2014)';
+
+$sql = 'SELECT * FROM publications WHERE issn="2373-0951"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0312-9764"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0027-4100" AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications where issn="0079-8835" and volume=59 and spage IS NOT NULL';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0085-4417" and year > 2013';
+
+//$sql = 'SELECT * FROM publications WHERE issn IN("0097-0425","1050-4842")';
+
+//$sql .= ' AND pdf IS NOT NULL AND spage IS NOT NULL';
+
+//$sql = 'SELECT * FROM publications WHERE guid="2246/1135"';
+
+
+// $sql = 'SELECT * FROM publications_amnh WHERE pdf IS NOT NULL';
 $sql .= ' ORDER BY CAST(series as SIGNED), CAST(volume as SIGNED), issue, CAST(spage as SIGNED)';
+
+//$sql .= ' LIMIT 1000 OFFSET 1000';
 
 
 

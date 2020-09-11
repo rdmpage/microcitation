@@ -203,7 +203,10 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 				$a['PERSEE']= $author->PERSEE;
 			}
 			
-			
+			if (isset($author->idref))
+			{
+				$a['IDREF']= $author->idref;
+			}
 
 			if (isset($author->multi))
 			{
@@ -357,8 +360,17 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 					$citeproc_obj['alternative-id'][] = 'SICI:' . $identifier->id;
 					break;
 					
+				case 'sudoc':
+					$citeproc_obj['SUDOC'] = $identifier->id;
+					$citeproc_obj['alternative-id'][] = 'SUDOC:' . $identifier->id;
+					break;
+					
 				case 'wayback':
 					$citeproc_obj['WAYBACK'] = $identifier->id;
+					break;					
+
+				case 'wikidata':
+					$citeproc_obj['WIKIDATA'] = $identifier->id;
 					break;					
 										
 				case 'zoobank':

@@ -80,6 +80,12 @@ class BioStorService extends ReconciliationService
 					$hit->id 	= $obj->results[$i]->guid;					
 					$hit->name 	= $obj->results[$i]->title;			
 					$hit->score = $obj->results[$i]->score;
+					
+					if (isset($obj->results[$i]->wikidata))
+					{
+						$hit->wikidata = $obj->results[$i]->wikidata;
+					}
+					
 					$hit->match = true;
 					$this->StoreHit($query_key, $hit);				
 				}

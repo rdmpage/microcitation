@@ -64,7 +64,7 @@ function find_from_citation (&$openurl_result)
 	
 	$str = clean_string($openurl_result->context_object->referent->dat);
 		
-$sql = 'SELECT guid, target, title, doi, handle, jstor, pdf, url, MATCH (target) AGAINST ("'
+$sql = 'SELECT guid, target, title, doi, handle, jstor, pdf, url, wikidata, MATCH (target) AGAINST ("'
 . addcslashes($str, '"')
 . '") AS score FROM publication_search '
 . 'INNER JOIN publications USING(guid) '
@@ -121,10 +121,12 @@ $sql = 'SELECT guid, target, title, doi, handle, jstor, pdf, url, MATCH (target)
 			$hit->url = $result->fields['url'];
 		}
 		
+		if (isset($result->fields['wikidata']))
+		{
+			$hit->wikidata = $result->fields['wikidata'];
+		}		
+		
 		$hit->guid = $result->fields['guid'];
-		
-		
-		
 		
 		// check
 		if (isset($hit->unstructured))
@@ -253,6 +255,11 @@ function find_from_title (&$openurl_result)
 		{
 			$hit->url = $result->fields['url'];
 		}
+		
+		if (isset($result->fields['wikidata']))
+		{
+			$hit->wikidata = $result->fields['wikidata'];
+		}		
 		
 		// check
 		if (isset($hit->title))

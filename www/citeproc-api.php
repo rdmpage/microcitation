@@ -128,7 +128,14 @@ $db->EXECUTE("set names 'utf8'");
 //--------------------------------------------------------------------------------------------------
 
 $sql = 'SELECT * FROM publications WHERE guid="' . $guid . '"';
+
+// Zootaxa is in its own table
+//$sql = 'SELECT * FROM `zootaxa-crossref` WHERE guid="' . $guid . '"';
+
 //$sql = 'SELECT * FROM `publications-extra` WHERE guid="' . $guid . '"';
+
+// $sql = 'SELECT * FROM `publications_amnh` WHERE guid="' . $guid . '"';
+
 
 if (!preg_match('/^10\./', $guid))
 {	
@@ -242,15 +249,15 @@ if ($result->NumRows() == 1)
 	// authors
 	if ($result->fields['authors'] != '')
 	{
-		$delimiter = ';';
-		
+	
+		$delimiter = '[;|；]';
+	
 		if ($issn == '1000-470X')
 		{
 			$delimiter = ',';
 		}
 	
-	
-		$authors = explode($delimiter, trim($result->fields['authors']));
+		$authors = preg_split('/' . $delimiter . '/u', trim($result->fields['authors']));	
 		
 		foreach ($authors as $a)
 		{
@@ -449,6 +456,17 @@ if ($result->NumRows() == 1)
 			$use_url = true;
 		}	
 		
+		// SUDOC
+		if (preg_match('/www.sudoc.fr\/(?<id>.*)/', $result->fields['url'], $m))
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'sudoc';
+			$identifier->id = $m['id'];
+			$reference->identifier[] = $identifier;		
+			
+			$use_url = false;
+		}			
+		
 	
 		if ($use_url)
 		{
@@ -555,6 +573,13 @@ if ($result->NumRows() == 1)
 		$reference->identifier[] = $identifier;
 	}	
 	
+	if ($result->fields['wikidata'] != '')
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'wikidata';
+		$identifier->id = $result->fields['wikidata'];
+		$reference->identifier[] = $identifier;
+	}
 	
 
 	if ($result->fields['publisher'] != '')
@@ -648,14 +673,14 @@ if ($result->NumRows() == 1)
 			case 'authors':
 				// big assumption, we've parsed author names OK
 				
-				$delimiter = ';';
+				$delimiter = '[;|；]';
 				
 				if ($issn == '1000-470X')
 				{
 					$delimiter = ',';
 				}
 				
-				$authors = explode($delimiter, trim($value));
+				$authors = preg_split('/' . $delimiter . '/u', trim($value));
 				
 				
 				
@@ -826,7 +851,7 @@ if ($result->NumRows() == 1)
 		}
 	}	
 	
-	
+	header("Content-type: application/json");
 	echo json_encode($c, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
 }

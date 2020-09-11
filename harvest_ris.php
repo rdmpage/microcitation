@@ -3,6 +3,7 @@
 // import from RIS
 
 require_once(dirname(__FILE__) . '/ris.php');
+require_once(dirname(__FILE__) . '/reference.php');
 
 
 //--------------------------------------------------------------------------------------------------
@@ -15,6 +16,8 @@ function ris_import($reference)
 		$reference->journal->pages .= $reference->pages; 
 		unset($reference->pages);
 	}
+	
+	$reference->title = html_entity_decode($reference->title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 	
 	
 	
@@ -193,6 +196,13 @@ function ris_import($reference)
 			
 				$values[] = '"' . $pdf . '"';
 			}
+			
+			if ($link->anchor == 'XML')
+			{
+				$keys[] = 'xml';
+				$values[] = '"' . $link->url . '"';
+			}
+			
 		}
 	}
 		
@@ -210,7 +220,10 @@ function ris_import($reference)
 					break;
 				
 				case 'handle':
-					$guid = $identifier->id;
+					if ($guid == '')
+					{				
+						$guid = $identifier->id;
+					}
 				
 					$keys[] = 'handle';
 					$values[] = '"' . $identifier->id . '"';
@@ -281,6 +294,43 @@ function ris_import($reference)
 	}
 	
 	
+	// SICI
+	
+	$get_sici = true;
+	
+	if (isset($issn))
+	{
+		switch ($issn)
+		{
+			// Russian
+			case '0367-1445':
+			case '0044-5134':
+			case '0726-9609':
+				$get_sici = false;
+				break;
+				
+			default:
+				break;
+		}
+	
+	}
+	
+	if ($get_sici)
+	{
+		$sici = reference_to_sici($reference);
+		if ($sici != '')
+		{
+			$keys[] = 'sici';
+			$values[] = '"' . addcslashes($sici, '"') . '"';
+		
+			if ($guid == '')	
+			{
+				$guid = $sici;
+			}		
+		}	
+	}
+	
+		
 	if (isset($reference->publisher_id))
 	{
 		if (preg_match('/oai:/', $reference->publisher_id))
@@ -288,6 +338,24 @@ function ris_import($reference)
 			$keys[] = 'oai';
 			$values[] = '"' . addcslashes($reference->publisher_id, '"') . '"';	
 		}
+		
+		if (preg_match('/urn:ISBN:/', $reference->publisher_id))
+		{
+			$isbn = str_replace('urn:ISBN:', '', $reference->publisher_id);
+			
+			if (strlen($isbn) == 10)
+			{
+				$keys[] = 'isbn10';
+				$values[] = '"' . addcslashes($isbn, '"') . '"';
+			}
+			if (strlen($isbn) == 13)
+			{
+				$keys[] = 'isbn13';
+				$values[] = '"' . addcslashes($isbn, '"') . '"';
+			}
+				
+		}
+		
 		
 		if ($guid == '')
 		{
@@ -343,7 +411,7 @@ function ris_import($reference)
 	//echo $reference->journal->volume . "\n";
 	
 	// populate from scratch (default)
-	if (1)
+	if (0)
 	{
 		$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
 			. join(',', $values) . ');';
@@ -389,11 +457,11 @@ function ris_import($reference)
 	if (0) 
 	{
 		// && in_array($reference->year, array(2009,2010,2011, 2012)))
-		if (isset($reference->year)  && in_array($reference->year, array(2009,2010,2011, 2012)))
+//		if (isset($reference->year)  && in_array($reference->year, array(2009,2010,2011, 2012)))
 		
 //		if (isset($reference->year)  && in_array($reference->year, array(2005)))
 		
-		//if (isset($reference->journal->volume)  && ($reference->journal->volume < 47))
+		if (isset($reference->journal->volume)  && ($reference->journal->volume < 48))
 		{
 			$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
 				. join(',', $values) . ');';
@@ -419,7 +487,7 @@ function ris_import($reference)
 	// Add data to existing record
 	if (0) 	
 	{
-		//if ($reference->year >= 2000) 
+		
 		if (1)
 		{
 		
@@ -507,9 +575,9 @@ function ris_import($reference)
 	
 	
 	// Add JSTOR to existing record
-	if (0) 
+	if (1) 
 	{
-		if (isset($reference->year) && ($reference->year >= 2013))
+		if (isset($reference->journal->volume)  && ($reference->journal->volume >= 48))
 		//if (1)
 		{
 		
@@ -557,7 +625,11 @@ function ris_import($reference)
 			
 			if (count($qualifiers) == 3)
 			{
-				$sql = 'UPDATE publications SET jstor="' . str_replace('http://www.jstor.org/stable/', '', $guid)
+				$jstor = $guid;
+				$jstor = str_replace('http://www.jstor.org/stable/', '', $jstor);
+				$jstor = str_replace('10.2307/', '', $jstor);
+				
+				$sql = 'UPDATE publications SET jstor="' . $jstor
 					. '" WHERE ' . join(" AND ", $qualifiers) . ';';
 					
 				echo $sql . "\n";

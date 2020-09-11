@@ -364,6 +364,14 @@ function process_ris_key($key, $value, &$obj)
 			$obj->link[] = $link;
 			break;
 			
+		case 'L2':
+			$link = new stdclass;
+			$link->url = $value;
+			$link->anchor = 'LINK';
+			$obj->link[] = $link;
+			break;
+			
+			
 
 		case 'UR':
 			
@@ -403,6 +411,15 @@ function process_ris_key($key, $value, &$obj)
 				}
 			
 				if (preg_match('/https:\/\/digital.csic.es\/handle\/(?<id>.*)/', $value, $m))
+				{
+					$identifier = new stdclass;
+					$identifier->type = 'handle';
+					$identifier->id = $m['id'];
+				
+					$obj->identifier[] = $identifier;				
+				}
+
+				if (preg_match('/https:\/\/repositories.lib.utexas.edu\/handle\/(?<id>.*)/', $value, $m))
 				{
 					$identifier = new stdclass;
 					$identifier->type = 'handle';
