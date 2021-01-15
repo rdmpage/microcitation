@@ -192,7 +192,7 @@ while (!$result->EOF)
 	$ris .= "ER  - \n\n";
 	
 	header("Content-type: text/plain");
-	echo $ris . "\n";
+	echo $ris;
 	
 	$result->MoveNext();
 }

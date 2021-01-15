@@ -102,7 +102,7 @@ while (!$result->EOF)
 
 	$ris = get($url);
 	
-	fwrite($ris_handle, $ris . "\n");
+	fwrite($ris_handle, $ris);
 	
 	
 	echo $ris;
