@@ -129,6 +129,8 @@ $db->EXECUTE("set names 'utf8'");
 
 $sql = 'SELECT * FROM publications WHERE guid="' . $guid . '"';
 
+$sql = 'SELECT * FROM publications_tmp WHERE guid="' . $guid . '"';
+
 // Zootaxa is in its own table
 //$sql = 'SELECT * FROM `zootaxa-crossref` WHERE guid="' . $guid . '"';
 
@@ -153,6 +155,11 @@ if (!preg_match('/^10\./', $guid))
 	}
 }
 
+// Wikidata
+if (preg_match('/^Q\d+$/', $guid))
+{
+	$sql = 'SELECT * FROM publications WHERE wikidata="' . $guid . '"';
+}
 
 
 $sql .= ' LIMIT 1;';
@@ -166,6 +173,8 @@ if ($result->NumRows() == 1)
 {
 
 	$issn = ''; // use this as a flag for some post processing
+	
+	$wikidata = ''; // empty by default, but we use this as the id if we have it.
 	
 	//print_r($result);
 	
@@ -184,6 +193,19 @@ if ($result->NumRows() == 1)
 	
 	$reference->title = $result->fields['title'];
 	$reference->title = strip_tags($reference->title);
+	
+	// special cases
+	// . American Museum novitates ; no. 1194
+	if ($result->fields['issn'] == '0003-0082')
+	{
+		if (preg_match('/(?<title>.*)\s+(?<journal>American Museum novitates)\s*;\s*no\.\s*(?<volume>\d+)/i', $reference->title, $m))
+		{
+			$reference->title = $m['title'];
+			$reference->title = preg_replace('/\.$/u', '', $reference->title);
+		
+		}
+	}
+
 	
 	if ($reference->type == 'article')
 	{
@@ -415,6 +437,8 @@ if ($result->NumRows() == 1)
 		
 	}	
 	
+	$cnki = '';
+	
 	// guid might be useful
 	if ($result->fields['guid'] != '')
 	{
@@ -425,9 +449,19 @@ if ($result->NumRows() == 1)
 			$identifier = new stdclass;
 			$identifier->type = 'cnki';
 			$identifier->id = $m['id'];
-			$reference->identifier[] = $identifier;		
+			$reference->identifier[] = $identifier;	
+			
+			$cnki= 	$m['id'];
 		}	
 	}
+	
+	if ($result->fields['cnki'] != '' && ($cnki == ''))
+	{
+		$identifier = new stdclass;
+		$identifier->type = 'cnki';
+		$identifier->id = $result->fields['cnki'];
+		$reference->identifier[] = $identifier;		
+	}	
 
 	
 	if ($result->fields['url'] != '')
@@ -465,7 +499,14 @@ if ($result->NumRows() == 1)
 			$reference->identifier[] = $identifier;		
 			
 			$use_url = false;
-		}			
+		}	
+		
+		// CiNii
+		if (preg_match('/ci.nii.ac.jp\/naid/', $result->fields['url'], $m))
+		{
+			$use_url = false;
+		}	
+				
 		
 	
 		if ($use_url)
@@ -479,15 +520,21 @@ if ($result->NumRows() == 1)
 	
 	if ($result->fields['pdf'] != '')
 	{
-		$link = new stdclass;
-		$link->anchor = 'PDF';
-		$link->url = $result->fields['pdf'];
-		$reference->link[] = $link;
+		// may have multiple values
+		$parts = explode("|", $result->fields['pdf']);
 		
-		if ($thumbnail_url == '')
-		{
-			$thumbnail_url = $link->url;
-		}		
+		foreach ($parts as $p)
+		{	
+			$link = new stdclass;
+			$link->anchor = 'PDF';
+			$link->url = $p;
+			$reference->link[] = $link;
+		
+			if ($thumbnail_url == '')
+			{
+				$thumbnail_url = $link->url;
+			}	
+		}	
 	}		
 	
 	// Zenodo, may be DOI or URL
@@ -579,6 +626,8 @@ if ($result->NumRows() == 1)
 		$identifier->type = 'wikidata';
 		$identifier->id = $result->fields['wikidata'];
 		$reference->identifier[] = $identifier;
+		
+		$wikidata = $identifier->id;
 	}
 	
 
@@ -596,7 +645,10 @@ if ($result->NumRows() == 1)
 	// abstract
 	if ($result->fields['abstract'] != '')
 	{
-		$reference->abstract = trim($result->fields['abstract']);
+		if ($result->fields['issn'] != '0003-0082')
+		{
+			$reference->abstract = trim($result->fields['abstract']);
+		}
 	}
 	
 	// thumbnails
@@ -764,8 +816,12 @@ if ($result->NumRows() == 1)
 		echo '</pre>';
 	}
 	
-	
-	$c = reference_to_citeprocjs($reference);
+	$citeproc_id = 'ITEM-1';
+	if ($wikidata != '')
+	{
+		$citeproc_id = $wikidata;
+	}
+	$c = reference_to_citeprocjs($reference, $citeproc_id);
 	
 	if (0)
 	{

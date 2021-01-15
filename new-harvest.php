@@ -277,6 +277,136 @@ $issns = array('0038-4909');
 $start 	= 2003;
 $end 	= 2021;
 
+// 0366-1326
+$issns = array('0366-1326');
+$start 	= 2013;
+$end 	= 2021;
+
+// 00044-5096
+$issns = array('0044-5096');
+$start 	= 1974;
+$end 	= 1974;
+
+// 0003-4983
+$issns = array('0003-4983');
+$start 	= 1907;
+$end 	= 2011;
+
+
+// EntomoBrasilis
+// 1983-0572
+$issns = array('1983-0572');
+$start 	= 2008;
+$end 	= 2020;
+
+// Anais da Escola Superior de Agricultura Luiz de Queiroz
+// 1983-0572
+$issns = array('0071-1276');
+$start 	= 1944;
+$end 	= 1991;
+
+
+// Annales de parasitologie humaine et comparée
+// 1983-0572
+$issns = array('0003-4150');
+$start 	= 1923;
+$end 	= 1993;
+
+$start 	= 1957;
+$end 	= 1957;
+
+// ВОПРОСЫ ИХТИОЛОГИИ 
+$issns = array('0042-8752');
+$start 	= 2012;
+$end 	= 2020;
+
+$issns = array('1097-993X');
+$start 	= 1998;
+$end 	= 2020;
+
+
+$issns = array('0004-2625');
+$start 	= 1925;
+$end 	= 1990;
+
+// Contributions to Zoology
+$issns = array('1875-9866');
+$issns = array('1383-4517');
+$start 	= 1997;
+$end 	= 2020;
+//$end 	= 1998;
+
+$issns = array('2465-423X');
+$start 	= 2015;
+$end 	= 2020;
+
+// Acta Botanica Malacitana
+$issns = array('0210-9506');
+$start 	= 1993;
+$end 	= 2020;
+
+$issns = array('2095-0845');
+$start 	= 2011;
+$end 	= 2016;
+
+
+
+$issns = array('0556-3321');
+$start 	= 2016;
+$end 	= 2020;
+
+
+// Journal of Herpetology (BioOne)
+$issns = array('0022-1511');
+$start 	= 2002;
+$end 	= 2020;
+
+// Checklist
+$issns = array('1809-127X');
+$start 	= 2005;
+$end 	= 2020;
+
+
+// Amphibia-Reptilia
+$issns = array('0173-5373');
+$start 	= 1980;
+$end 	= 2020;
+
+
+// ZOOS' PRINT JOURNAL
+$issns = array('0973-2535');
+$start 	= 1995;
+$end 	= 2020;
+
+// Rheedea
+$issns = array('0971-2313');
+$start 	= 2015;
+$end 	= 2020;
+
+
+// Gardens' Bulletin Singapore
+$issns = array('2382-5812');
+$start 	= 2010;
+$end 	= 2020;
+
+
+// Darwiniana
+$issns = array('0011-6793');
+$start 	= 2012;
+$end 	= 2020;
+
+// Bot. Zhurn. (Moscow & Leningrad)
+$issns = array('0006-8136');
+$start 	= 2010;
+$end 	= 2020;
+
+// Mycological Progress
+$issns = array('1617-416X');
+$start 	= 2002;
+$end 	= 2020;
+
+
+
 
 
 $limit = 1000;
@@ -396,6 +526,12 @@ foreach ($issns as $issn)
 						
 							}
 							break;
+							
+						case 'article-number':
+							$keys[] = 'article_number';
+							$values[] = '"' . $v . '"';							
+							break;
+							
 					
 						case 'author':
 							$authors = array();

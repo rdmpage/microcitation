@@ -519,11 +519,67 @@ $sql = 'SELECT * FROM publications where issn="0079-8835" and volume=59 and spag
 
 $sql = 'SELECT * FROM publications WHERE issn="0085-4417" and year > 2013';
 
+$sql = 'SELECT * FROM publications WHERE issn="0003-4983"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0080-4274" AND volume=33';
+
+$sql .= ' AND pdf IS NOT NULL AND spage IS NOT NULL';
+
+
+// Get PMID
+$sql = 'SELECT * FROM publications WHERE issn="0003-4150" AND year >= 1945';
+
+$sql = 'SELECT * FROM publications WHERE issn="0042-8752" AND zoobank="x"';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0041-1752" AND guid LIKE "10520%" AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications_tmp WHERE issn="2096-2703" AND pdf IS NOT NULL';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="1005-3395" AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="1346-7565" AND pdf IS NOT NULL AND guid LIKE "10%"';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="1674-4918" AND pdf LIKE "http://www.plantsystematics.com/CN/article/%"';
+
+// Notes From The Royal Botanic Garden Edinburgh 
+$sql = 'SELECT * FROM publications WHERE issn="0080-4274" AND  volume=30 and issue=1';
+
+$sql = 'SELECT * FROM publications WHERE issn="1808-2688" AND pdf IS NOT NULL ';
+
+// Trying to fix Chinese PDFs
+$sql = 'SELECT * FROM publications WHERE issn="1674-4918" AND pdf IS NOT NULL AND pii="badpdf"';
+$sql = 'SELECT * FROM publications WHERE issn="1005-3395" AND pdf IS NOT NULL AND pii="badpdf"';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0067-0464" and volume=1 and spage is not null';
+
+// Sichuan Journal of Zoology
+$sql = 'SELECT * FROM publications WHERE guid="http://www.scdwzz.com/viewmulu_en.aspx?qi_id=117&mid=3905"';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="1000-7083" and pdf is not null';
+
+$sql = 'SELECT * FROM publications WHERE issn="0080-4274" and pdf is not null';
+
+$sql = 'SELECT * FROM publications_tmp WHERE issn="1409-3871"';
+
+$sql = 'SELECT * FROM publications_tmp WHERE issn="1409-3871" and doi is null ';
+
+$sql = 'SELECT * FROM publications WHERE issn="0024-0672" and volume="80" and spage="87"';
+
+$sql = 'SELECT * FROM publications WHERE guid like "https://repository.naturalis.nl/pub/%" AND internetarchive IS NULL and issn="0024-0672" and pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0128-5939"';
+
 //$sql = 'SELECT * FROM publications WHERE issn IN("0097-0425","1050-4842")';
 
-//$sql .= ' AND pdf IS NOT NULL AND spage IS NOT NULL';
 
 //$sql = 'SELECT * FROM publications WHERE guid="2246/1135"';
+
+//$sql = 'SELECT * FROM publications WHERE issn="0312-3162" and year =2008 and biostor is null';
 
 
 // $sql = 'SELECT * FROM publications_amnh WHERE pdf IS NOT NULL';

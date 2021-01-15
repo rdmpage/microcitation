@@ -195,6 +195,14 @@ function process_ris_key($key, $value, &$obj)
 			break;
 			
 		case 'SN':
+		
+			// handle bizarre JSTOR, e.g. SN  - 00028444, 1938422X
+			if (preg_match('/(?<one>[0-9]{7}([0-9]|X))(,\s*(?<two>[0-9]{7}([0-9]|X)))?/i', $value, $m))
+			{
+				$value = substr($m['one'], 0, 4) . '-' . substr($m['one'], 4);
+			}		
+			
+			
 			$identifier = new stdclass;			
 			$identifier->id = $value;
 			if ($obj->type == 'book')

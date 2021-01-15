@@ -401,10 +401,23 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 				switch ($link->anchor)
 				{
 					case 'LINK':
-						$citeproc_obj['URL'] = $link->url;
+						$url = $link->url;
+						$url = str_replace('&amp;', '&', $url);
 					
 					
-						$citeproc_obj['alternative-id'][] = $link->url;
+						$citeproc_obj['URL'] = $url;
+					
+					
+						$citeproc_obj['alternative-id'][] = $url;
+						
+						
+						// URL-based ids
+						if (preg_match('/https?:\/\/dialnet.unirioja.es\/servlet\/articulo\?codigo=(?<id>\d+)/', $url, $m))
+						{
+							$citeproc_obj['DIALNET'] = $m['id'];
+						}
+						
+						
 						break;
 
 					case 'PDF':
@@ -429,7 +442,7 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 					
 						$citeproc_obj['link'][] = $pdf;
 						
-						$citeproc_obj['alternative-id'][] = $link->url;
+						$citeproc_obj['alternative-id'][] = $pdf->URL;
 						break;
 					
 					case 'XML':

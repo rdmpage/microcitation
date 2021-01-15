@@ -160,6 +160,14 @@ function ris_import($reference)
 					$add = true;
 				}
 				
+				if (preg_match('/https?:\/\/www.cnki.com.cn\/Article\/CJFDTOTAL-(?<id>.*)\.htm/', $link->url, $m))
+				{
+						$keys[] = 'cnki';
+						$values[] = '"' . $m['id']. '"';
+
+				}
+				
+				
 				
 				if ($add)
 				{		
@@ -220,7 +228,7 @@ function ris_import($reference)
 					break;
 				
 				case 'handle':
-					if ($guid == '')
+					//if ($guid == '')
 					{				
 						$guid = $identifier->id;
 					}
@@ -294,6 +302,13 @@ function ris_import($reference)
 	}
 	
 	
+	if (isset($reference->keyword))
+	{
+		$keys[] = 'keywords';
+		$values[] = '"' . join(';', $reference->keyword) . '"';
+	}
+	
+	
 	// SICI
 	
 	$get_sici = true;
@@ -306,6 +321,7 @@ function ris_import($reference)
 			case '0367-1445':
 			case '0044-5134':
 			case '0726-9609':
+			case '0080-4274':
 				$get_sici = false;
 				break;
 				
@@ -411,7 +427,7 @@ function ris_import($reference)
 	//echo $reference->journal->volume . "\n";
 	
 	// populate from scratch (default)
-	if (0)
+	if (1)
 	{
 		$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') values('
 			. join(',', $values) . ');';
@@ -575,7 +591,7 @@ function ris_import($reference)
 	
 	
 	// Add JSTOR to existing record
-	if (1) 
+	if (0) 
 	{
 		if (isset($reference->journal->volume)  && ($reference->journal->volume >= 48))
 		//if (1)

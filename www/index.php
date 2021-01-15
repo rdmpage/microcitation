@@ -201,8 +201,12 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 	}
 	
 	//----------------------- build query --------
+	
+	// range query
 
 	$sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
+	
+	$sql = 'SELECT * FROM publications_tmp WHERE issn="' . $issn . '"';
 	 
 	if (isset($obj->volume))
 	{
@@ -217,8 +221,11 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 	{
 		$sql .= ' AND article_number="' . $article_number . '"';
 	}
-	 
-	$sql .= ' AND (' . $page . ' between spage and epage)';
+	
+	if ($obj->page != '')
+	{	 
+		$sql .= ' AND ((' . $page . ' between spage and epage) OR (spage="' . $page . '"))';
+	}
 	
 	if (isset($obj->year))
 	{
@@ -230,7 +237,7 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 		$sql .= ' AND series=' . $series;
 	}
 	
-	if (isset($obj->authors))
+	if (isset($obj->authors) && ($obj->issn != '0011-9970'))
 	{
 		$sql .= ' AND authors LIKE "%' .$obj->authors . '%"';
 	}
@@ -238,6 +245,50 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 	// hack for multiple records
 	//$sql .= ' AND url LIKE "http://www.repository.naturalis.nl/%"';
 	//$sql .= ' AND doi IS NOT NULL';
+	
+	if ($obj->issn == '0041-1752')
+	{
+		$sql .= ' AND guid LIKE "10520%"';
+	}
+	
+	if ($obj->issn == '0029-8948')
+	{
+		$sql .= ' AND guid LIKE "10.%"';
+	}
+	
+	if ($obj->issn == '0011-9970')
+	{
+		// Author names may be in the title not in separate field
+		if (isset($obj->authors))
+		{
+			$sql .= ' AND (authors LIKE "%' .$obj->authors . '%" OR title LIKE "%' .$obj->authors . '%")';
+		}
+	}		
+	
+	//-----------------
+	// lower bound query
+	if (0)
+	{
+		$sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
+	 
+		if (isset($obj->volume))
+		{
+			$sql .= ' AND volume="' . $volume . '"';
+		}
+		if (isset($obj->issue))
+		{
+			$sql .= ' AND issue="' . $issue . '"';
+		}
+
+		if (isset($obj->article_number))
+		{
+			$sql .= ' AND article_number="' . $article_number . '"';
+		}
+	 
+		$sql .= ' AND (' . $page . ' >= spage)';
+	
+		$sql .= ' ORDER BY CAST(spage AS SIGNED) DESC LIMIT 1';
+	}	
 	
 	$obj->sql = $sql;
 
@@ -275,9 +326,26 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 		{
 			$hit->pdf = $result->fields['pdf'];
 		}
-		if (isset($result->fields['url']))
+		
+		if ($obj->issn == '1673-5102')
 		{
-			$hit->url = $result->fields['url'];
+			if (isset($result->fields['guid']))
+			{
+				$hit->url = $result->fields['guid'];
+			}
+		
+		}
+		else
+		{
+			if (isset($result->fields['url']))
+			{
+				$hit->url = $result->fields['url'];
+			}
+		
+			if (isset($result->fields['guid']))
+			{
+				$hit->guid = $result->fields['guid'];
+			}
 		}
 				
 		$obj->results[] = $hit;
@@ -342,7 +410,8 @@ function main()
 	{
 		if (isset($_GET['issn']) 
 			&& (isset($_GET['volume']) || isset($_GET['year']) || isset($_GET['issue']))
-			&& isset($_GET['page']))
+			&& (isset($_GET['page']) || isset($_GET['article_number']) || isset($_GET['authors']))
+			)
 		{
 			$issn = '';
 			$volume = '';

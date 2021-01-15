@@ -640,6 +640,7 @@ function get_doi_metadata_unixref($doi, &$reference)
 //----------------------------------------------------------------------------------------
 function reference_to_sql($reference)
 {
+
 	$keys = array();
 	$values = array();
 	
@@ -819,6 +820,30 @@ function reference_to_sql($reference)
 	
 }
 
+
+//----------------------------------------------------------------------------------------
+function update_pages($doi, $reference)
+{
+
+	if (isset($reference->journal))
+	{
+		
+		if (isset($reference->journal->pages))
+		{
+			$parts = explode("--", $reference->journal->pages);
+			if (count($parts) == 2)
+			{
+				echo 'UPDATE publications SET spage="' . addcslashes($parts[0], '"') . '",epage=' . '"' . addcslashes($parts[1], '"') . '" WHERE guid="' . $doi . '";' . "\n";
+			}
+			else
+			{
+				echo 'UPDATE publications SET spage="' . addcslashes($parts[0], '"') . '" WHERE guid="' . $doi . '";' . "\n";
+			}
+		}
+	}
+		
+
+}
 
 // test
 if (0)
@@ -13644,13 +13669,153 @@ $dois=array(
 
 );
 
+$dois=array('10.18195/issn.0312-3162.26(2).2011.191-201');
+
+$dois=array(
+'10.3406/linly.1999.11290',
+'10.3406/linly.1999.11301',
+'10.3406/linly.1998.11254',
+'10.3406/linly.2002.13429',
+'10.3406/linly.2004.13523',
+'10.3406/linly.2004.13506',
+'10.3406/linly.2004.13503',
+'10.3406/linly.2005.13586',
+'10.3406/linly.2011.13800',
+'10.3406/linly.2010.13788',
+'10.3406/linly.2009.13724',
+'10.3406/linly.2009.13714',
+'10.3406/linly.2007.13656',
+'10.3406/linly.2006.13632',
+'10.3406/linly.2006.13640',
+'10.3406/linly.2006.13635',
+'10.3406/linly.2005.13606',
+);
+
+$dois=array(
+'10.33307/entomon.v45i2.525',
+'10.33307/entomon.v43i4.402',
+'10.33307/entomon.v43i4.403',
+'10.33307/entomon.v43i4.404',
+'10.33307/entomon.v43i4.405',
+'10.33307/entomon.v43i4.406',
+'10.33307/entomon.v43i4.407',
+'10.33307/entomon.v43i4.408',
+'10.33307/entomon.v43i4.409',
+'10.33307/entomon.v43i4.410',
+'10.33307/entomon.v43i4.411',
+'10.33307/entomon.v43i4.412',
+'10.33307/entomon.v44i1.421',
+'10.33307/entomon.v44i1.422',
+'10.33307/entomon.v44i1.423',
+'10.33307/entomon.v44i1.424',
+'10.33307/entomon.v44i1.425',
+'10.33307/entomon.v44i1.426',
+'10.33307/entomon.v44i1.427',
+'10.33307/entomon.v44i1.428',
+'10.33307/entomon.v44i1.429',
+'10.33307/entomon.v44i1.430',
+'10.33307/entomon.v44i2.434',
+'10.33307/entomon.v44i2.435',
+'10.33307/entomon.v44i2.436',
+'10.33307/entomon.v44i2.437',
+'10.33307/entomon.v44i2.438',
+'10.33307/entomon.v44i2.439',
+'10.33307/entomon.v44i2.440',
+'10.33307/entomon.v44i2.441',
+'10.33307/entomon.v44i2.442',
+'10.33307/entomon.v44i2.443',
+'10.33307/entomon.v44i2.444',
+'10.33307/entomon.v44i3.457',
+'10.33307/entomon.v44i3.458',
+'10.33307/entomon.v44i3.459',
+'10.33307/entomon.v44i3.460',
+'10.33307/entomon.v44i3.461',
+'10.33307/entomon.v44i3.462',
+'10.33307/entomon.v44i3.466',
+'10.33307/entomon.v44i3.467',
+'10.33307/entomon.v44i3.468',
+'10.33307/entomon.v44i3.469',
+'10.33307/entomon.v44i3.470',
+'10.33307/entomon.v44i3.471',
+'10.33307/entomon.v44i4.475',
+'10.33307/entomon.v44i4.476',
+'10.33307/entomon.v44i4.477',
+'10.33307/entomon.v44i4.478',
+'10.33307/entomon.v44i4.479',
+'10.33307/entomon.v44i4.480',
+'10.33307/entomon.v44i4.481',
+'10.33307/entomon.v44i4.482',
+'10.33307/entomon.v44i4.483',
+'10.33307/entomon.v44i4.484',
+'10.33307/entomon.v44i4.485',
+'10.33307/entomon.v44i4.486',
+'10.33307/entomon.v44i4.487',
+'10.33307/entomon.v45i1.497',
+'10.33307/entomon.v45i1.498',
+'10.33307/entomon.v45i1.500',
+'10.33307/entomon.v45i1.501',
+'10.33307/entomon.v45i1.502',
+'10.33307/entomon.v45i1.503',
+'10.33307/entomon.v45i1.504',
+'10.33307/entomon.v45i1.505',
+'10.33307/entomon.v45i1.506',
+'10.33307/entomon.v45i1.507',
+'10.33307/entomon.v45i2.516',
+'10.33307/entomon.v45i2.517',
+'10.33307/entomon.v45i2.518',
+'10.33307/entomon.v45i2.519',
+'10.33307/entomon.v45i2.520',
+'10.33307/entomon.v45i2.521',
+'10.33307/entomon.v45i2.522',
+'10.33307/entomon.v45i2.523',
+'10.33307/entomon.v45i2.524',
+
+);
+
+$dois=array(
+'10.5962/BHL.PART.16138',
+'10.5962/BHL.PART.16139',
+'10.5962/BHL.PART.16140',
+'10.5962/BHL.PART.16141',
+'10.5962/BHL.PART.16142',
+'10.5962/BHL.PART.16145',
+'10.5962/BHL.PART.16148',
+'10.5962/BHL.PART.16153',
+'10.5962/BHL.PART.16155',
+'10.5962/BHL.PART.24592',
+'10.5962/BHL.PART.24595',
+'10.5962/BHL.PART.24597',
+'10.5962/BHL.PART.24601',
+'10.5962/BHL.PART.24602',
+'10.5962/BHL.PART.24603',
+'10.5962/BHL.PART.24605',
+'10.5962/BHL.PART.24606',
+'10.5962/BHL.PART.24607',
+'10.5962/BHL.PART.24608',
+);
+
+$dois=array(
+
+'10.3850/S2382581215000228',
+'10.3850/S2382581215000241',
+'10.3850/S2382581215000253',
+'10.3850/S2382581215000277',
+'10.3850/S2382581215000289',
+'10.3850/S2382581215000290',
+'10.3850/S2382581215000307',
+'10.3850/S2382581215000319',
+
+
+);
+
+
 	$count = 0;
 	foreach ($dois as $doi)
 	{
 		echo "-- $doi\n";
 		
 		
-		if (0)
+		if (1)
 		{
 			$reference = new stdclass;
 			get_doi_metadata_unixref($doi, $reference);
@@ -13665,7 +13830,16 @@ $dois=array(
 	
 		//print_r($reference);
 	
-		reference_to_sql($reference);
+		if (1)
+		{
+			// grab all the metadata
+			reference_to_sql($reference);
+		}
+		else
+		{
+			// just add pages
+			update_pages($doi, $reference);
+		}
 		
 		if (($count++ % 10) == 0)
 		{
