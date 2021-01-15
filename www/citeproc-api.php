@@ -107,10 +107,20 @@ $guid = '10.3767/000651906x622210';
 
 //$guid = '';
 
+$table = 'publications';
+
 if (isset($_GET['guid']))
 {
 	$guid = $_GET['guid'];
 }
+
+if (isset($_GET['table']))
+{
+	$table = $_GET['table'];
+}
+
+$do_thumbnails = false;
+
 
 //--------------------------------------------------------------------------------------------------
 $db = NewADOConnection('mysqli');
@@ -127,9 +137,9 @@ $db->EXECUTE("set names 'utf8'");
 
 //--------------------------------------------------------------------------------------------------
 
-$sql = 'SELECT * FROM publications WHERE guid="' . $guid . '"';
+$sql = 'SELECT * FROM ' . $table . ' WHERE guid="' . $guid . '"';
 
-$sql = 'SELECT * FROM publications_tmp WHERE guid="' . $guid . '"';
+//$sql = 'SELECT * FROM publications_tmp WHERE guid="' . $guid . '"';
 
 // Zootaxa is in its own table
 //$sql = 'SELECT * FROM `zootaxa-crossref` WHERE guid="' . $guid . '"';
@@ -652,24 +662,26 @@ if ($result->NumRows() == 1)
 	}
 	
 	// thumbnails
-	if ($thumbnail_url != '')
+	if ($do_thumbnails)
 	{
-		//echo $thumbnail_url . '<br/>';
-		if (0)
+		if ($thumbnail_url != '')
 		{
-			get_pdf_thumbnail($reference, $thumbnail_url);
+			//echo $thumbnail_url . '<br/>';
+			if (0)
+			{
+				get_pdf_thumbnail($reference, $thumbnail_url);
+			}
 		}
-	}
-		
 
-	if ($result->fields['jstor'] != '')
-	{
-		get_jstor_thumbnail($reference, $result->fields['jstor']);
-	}
+		if ($result->fields['jstor'] != '')
+		{
+			get_jstor_thumbnail($reference, $result->fields['jstor']);
+		}
 
-	if ($result->fields['thumbnailUrl'] != '')
-	{
-		$reference->thumbnailUrl = $result->fields['thumbnailUrl'];
+		if ($result->fields['thumbnailUrl'] != '')
+		{
+			$reference->thumbnailUrl = $result->fields['thumbnailUrl'];
+		}
 	}
 	
 	if ($result->fields['license'] != '')
@@ -849,59 +861,60 @@ if ($result->NumRows() == 1)
 		}
 		
 	
-	
-		if ($link_index > -1)
+		if ($do_thumbnails)
 		{
-			$pdf = $c['link'][$link_index]->URL;
-			$sql = 'SELECT * FROM sha1 WHERE pdf="' . addcslashes($pdf, '"') . '" LIMIT 1';
-		
-			// echo $sql;
-			$result = $db->Execute($sql);
-			if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
-	
-			if ($result->NumRows() == 1) 
+			if ($link_index > -1)
 			{
-				$sha1 = $result->fields['sha1'];
-			
-				$c['link'][$link_index]->sha1 = $sha1;
-			
-				// get details
-				$json = get('http://bionames.org/bionames-archive/documentcloud/' . $sha1 . '.json');
-				if ($json)
+				$pdf = $c['link'][$link_index]->URL;
+				$sql = 'SELECT * FROM sha1 WHERE pdf="' . addcslashes($pdf, '"') . '" LIMIT 1';
+		
+				// echo $sql;
+				$result = $db->Execute($sql);
+				if ($result == false) die("failed [" . __LINE__ . "]: " . $sql);
+	
+				if ($result->NumRows() == 1) 
 				{
-					$obj = json_decode($json);
+					$sha1 = $result->fields['sha1'];
+			
+					$c['link'][$link_index]->sha1 = $sha1;
+			
+					// get details
+					$json = get('http://bionames.org/bionames-archive/documentcloud/' . $sha1 . '.json');
+					if ($json)
+					{
+						$obj = json_decode($json);
 				
-					$c['page-images'] = array();
-					$c['page-thumbnails'] = array();
-					for ($i = 1; $i <= $obj->pages; $i++)
-					{
-						$c['page-images'][$i] = 'http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i . '-large';
-						$c['page-thumbnails'][$i] = 'http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i . '-small';
-					}	
-
-					$c['page-text'] = array();
-					for ($i = 1; $i <= $obj->pages; $i++)
-					{
-						$text = get('http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i);
-						if ($text != '')
+						$c['page-images'] = array();
+						$c['page-thumbnails'] = array();
+						for ($i = 1; $i <= $obj->pages; $i++)
 						{
-							$c['page-text'][] = json_decode($text);
+							$c['page-images'][$i] = 'http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i . '-large';
+							$c['page-thumbnails'][$i] = 'http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i . '-small';
+						}	
+
+						$c['page-text'] = array();
+						for ($i = 1; $i <= $obj->pages; $i++)
+						{
+							$text = get('http://bionames.org/bionames-archive/documentcloud/pages/' . $sha1 . '/' . $i);
+							if ($text != '')
+							{
+								$c['page-text'][] = json_decode($text);
+							}
+						}	
+						if (count($c['text_pages']) == 0)
+						{
+							unset($c['text_pages']);
 						}
-					}	
-					if (count($c['text_pages']) == 0)
-					{
-						unset($c['text_pages']);
-					}
 				
 				
 							
-				}
+					}
 						
-				// OCR text?
+					// OCR text?
 			
 			
-			}
-		
+				}
+			}		
 	
 	
 		}
