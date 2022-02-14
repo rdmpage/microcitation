@@ -9,7 +9,7 @@ require_once(dirname(__FILE__) . '/reference.php');
 //--------------------------------------------------------------------------------------------------
 function ris_import($reference)
 {
-	//print_r($reference);
+	// print_r($reference);
 	
 	if (isset($reference->journal) && isset($reference->pages))
 	{
@@ -31,6 +31,8 @@ function ris_import($reference)
 	$guid = '';
 	
 	$pdf = '';
+	
+	
 	
 	$keys = array();
 	$values= array();
@@ -140,6 +142,14 @@ function ris_import($reference)
 				
 				
 				$add = true;
+				
+				
+				// www.documentation.ird.fr
+				if (preg_match('/www.documentation.ird.fr/', $link->url))
+				{
+					$guid = $link->url;
+				}
+				
 			
 				if (preg_match('/http:\/\/dx.doi.org\//', $link->url))
 				{
@@ -160,6 +170,13 @@ function ris_import($reference)
 					$add = true;
 				}
 				
+				if (preg_match('/http:\/\/direct.biostor.org\//', $link->url))
+				{
+					$add = false;
+				}
+				
+				
+				
 				if (preg_match('/https?:\/\/www.cnki.com.cn\/Article\/CJFDTOTAL-(?<id>.*)\.htm/', $link->url, $m))
 				{
 						$keys[] = 'cnki';
@@ -167,7 +184,13 @@ function ris_import($reference)
 
 				}
 				
-				
+				/*
+				if (preg_match('/handle\/(?<id>.*)/', $link->url, $m))
+				{
+						$keys[] = 'handle';
+						$values[] = '"' . $m['id']. '"';					
+				}
+				*/
 				
 				if ($add)
 				{		
@@ -221,7 +244,20 @@ function ris_import($reference)
 			switch ($identifier->type)
 			{
 				case 'doi':
-					$guid = $identifier->id;
+					$use_doi = true;
+				
+					if ($guid != '')
+					{
+						if (preg_match('/www.documentation.ird.fr/', $guid))
+						{
+							$use_doi = false;
+						}
+					}
+				
+					if ($use_doi)
+					{
+						$guid = $identifier->id;
+					}
 				
 					$keys[] = 'doi';
 					$values[] = '"' . $identifier->id . '"';
@@ -254,6 +290,13 @@ function ris_import($reference)
 					$keys[] = 'jstor';
 					$values[] = '"' . $identifier->id . '"';
 					break;
+					
+				case 'biostor':
+					$keys[] = 'biostor';
+					$values[] = '"' . $identifier->id . '"';
+					$guid = 'https://biostor.org/reference/' . $identifier->id;
+					break;
+					
 
 				case 'wos':
 					if ($guid == '')
@@ -301,17 +344,19 @@ function ris_import($reference)
 		$values[] = '"' . addcslashes($reference->abstract, '"') . '"';	
 	}
 	
-	
+	/*
 	if (isset($reference->keyword))
 	{
 		$keys[] = 'keywords';
 		$values[] = '"' . join(';', $reference->keyword) . '"';
 	}
+	*/
 	
 	
 	// SICI
 	
 	$get_sici = true;
+	$get_sici = false;
 	
 	if (isset($issn))
 	{
@@ -433,6 +478,13 @@ function ris_import($reference)
 			. join(',', $values) . ');';
 		echo $sql . "\n";
 	}
+	if (0)
+	{
+		$sql = 'REPLACE INTO publications_biostor(' . join(',', $keys) . ') values('
+			. join(',', $values) . ');';
+		echo $sql . "\n";
+	}
+
 	
 	// Only add articles from a given journal
 	// 
@@ -501,10 +553,28 @@ function ris_import($reference)
 	}
 	
 	// Add data to existing record
+	
+	
+	if (0) 
+	{
+		/*
+		if (isset($reference->journal->pages))
+		{
+			echo 'UPDATE publications_eperiodica SET spage="' . $reference->journal->pages . '" WHERE guid="' . $guid . '";' . "\n";
+		}
+		*/
+		if (isset($reference->journal->volume))
+		{
+			echo 'UPDATE publications_eperiodica SET volume="' . $reference->journal->volume . '" WHERE guid="' . $guid . '";' . "\n";
+		}
+
+	}		
+	
+	
 	if (0) 	
 	{
 		
-		if (1)
+		if (0)
 		{
 		
 			$qualifiers = array();

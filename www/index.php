@@ -76,7 +76,7 @@ function find_from_title ($title, $filters = null)
 	$obj->found = false;
 	$obj->title = $title;
 
-	$sql = 'SELECT guid, doi, title, pdf, url, MATCH (title) AGAINST ("' . addcslashes($title, '"') . '") AS score FROM publications AS score WHERE MATCH (title) AGAINST ("' . addcslashes($title, '"') . '")';
+	$sql = 'SELECT guid, doi, title, pdf, url, cinii, MATCH (title) AGAINST ("' . addcslashes($title, '"') . '") AS score FROM publications AS score WHERE MATCH (title) AGAINST ("' . addcslashes($title, '"') . '")';
 	
 	if ($filters)
 	{
@@ -134,6 +134,11 @@ function find_from_title ($title, $filters = null)
 		{
 			$hit->url = $result->fields['url'];
 		}
+		if (isset($result->fields['cinii']))
+		{
+			$hit->cinii = $result->fields['cinii'];
+		}
+		
 		
 		// check
 		if (isset($hit->title))
@@ -200,21 +205,34 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 		$obj->authors = $authors;
 	}
 	
+	
+	// ISNN probs
+	if ($obj->issn == '2095-0845')
+	{		
+		$obj->issn = '2096-2703';
+	}	
+	
 	//----------------------- build query --------
 	
 	// range query
 
-	$sql = 'SELECT * FROM publications WHERE issn="' . $issn . '"';
+	$sql = 'SELECT * FROM publications WHERE issn="' . $obj->issn . '"';
 	
-	$sql = 'SELECT * FROM publications_tmp WHERE issn="' . $issn . '"';
+	//$sql = 'SELECT * FROM publications WHERE isbn13="' . $obj->issn . '"';
+	
+	//$sql = 'SELECT * FROM publications_tmp WHERE issn="' . $obj->issn . '" and doi is not null';
+	// $sql = 'SELECT * FROM `acta botanica yunnanica-tmp-wd` WHERE issn="' . $obj->issn . '"';
+	
+	//$sql = 'SELECT * FROM `botanische jahrbücher-zobodat-wd` WHERE issn="' . $obj->issn . '"';
+
 	 
 	if (isset($obj->volume))
-	{
-		$sql .= ' AND volume="' . $volume . '"';
+	{	
+		$sql .= ' AND volume="' . $obj->volume . '"';
 	}
 	if (isset($obj->issue))
 	{
-		$sql .= ' AND issue="' . $issue . '"';
+		$sql .= ' AND issue="' . $obj->issue . '"';
 	}
 
 	if (isset($obj->article_number))
@@ -245,6 +263,7 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 	// hack for multiple records
 	//$sql .= ' AND url LIKE "http://www.repository.naturalis.nl/%"';
 	//$sql .= ' AND doi IS NOT NULL';
+	//$sql .= ' AND guid LIKE "https://biostor.org/%"';
 	
 	if ($obj->issn == '0041-1752')
 	{
@@ -263,7 +282,65 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 		{
 			$sql .= ' AND (authors LIKE "%' .$obj->authors . '%" OR title LIKE "%' .$obj->authors . '%")';
 		}
-	}		
+	}	
+	
+	
+	// only have a lower bound
+	if (0)
+	{
+		$sql = 'SELECT * FROM publications_eperiodica WHERE issn="' . $obj->issn . '"';
+	 
+		if (isset($obj->volume))
+		{
+			$sql .= ' AND volume="' . $volume . '"';
+		}
+		
+		if (isset($obj->issue))
+		{
+			$sql .= ' AND issue="' . $issue . '"';
+		}
+
+		if ($obj->page != '')
+		{	 
+			$sql .= ' AND CAST(spage as SIGNED) <= ' . $page;
+		}
+	
+		if (isset($obj->year))
+		{
+			$sql .= ' AND year=' . $year;
+		}
+	
+	
+		if (isset($obj->authors))
+		{
+			$authors = $obj->authors;
+			
+			if ($authors == 'C.DC.')
+			{
+				$parts = array('Candolle');
+			}
+			else
+			{			
+				$authors = str_replace('St-', 'Saint-', $authors);
+				
+				$authors = str_replace(', ', '|', $authors);				
+				$authors = str_replace('.-', '|', $authors);
+				$authors = str_replace(' & ', '|', $authors);
+				
+				$authors = str_replace('.', '', $authors);
+				
+			
+				$parts = explode('|', $authors);
+			}
+		
+			$sql .= ' AND authors LIKE "%' . join('%', $parts) . '%"';
+		}
+		
+		$sql .= ' AND title like "N%"';
+	
+		$sql .= ' ORDER BY CAST(spage as SIGNED) DESC LIMIT 1';
+	}
+
 	
 	//-----------------
 	// lower bound query
@@ -326,6 +403,12 @@ function find ($issn, $volume, $issue='', $page, $series='', $year = '', $articl
 		{
 			$hit->pdf = $result->fields['pdf'];
 		}
+		
+		if (isset($result->fields['cinii']))
+		{
+			$hit->cinii = $result->fields['cinii'];
+		}
+		
 		
 		if ($obj->issn == '1673-5102')
 		{

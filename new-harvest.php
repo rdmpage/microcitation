@@ -405,7 +405,257 @@ $issns = array('1617-416X');
 $start 	= 2002;
 $end 	= 2020;
 
+// Travaux du Museum d'Histoire Naturelle "Grigore Antipa"
+$issns = array('1223-2254');
+$start 	= 2019;
+$end 	= 2020;
+$start 	= 2008;
+$end 	= 2018;
 
+$issns = array('0013-8711');
+$start 	= 1970;
+$end 	= 1999;
+
+$issns = array('0328-0381');
+$start 	= 2004;
+$end 	= 2005;
+
+
+
+$issns = array('0015-542X');
+$start 	= 2017;
+$end 	= 2021;
+
+// Cryptogamie. Algologie
+$issns = array('0181-1568');
+$start 	= 1999;
+$end 	= 2021;
+
+
+$issns = array('0085-2988');
+$start 	= 1957;
+$end 	= 1993;
+
+$issns = array('1211-0981');
+$start 	= 1993;
+$end 	= 2021;
+
+// Records of The Auckland Museum
+$issns = array('1174-9202');
+$start 	= 2010;
+$end 	= 2021;
+
+// Memórias do Instituto Oswaldo Cruz
+$issns = array('0074-0276');
+$start 	= 1909;
+$end 	= 2021;
+$start 	= 2000;
+$end 	= 2001;
+
+// Annals of the Lyceum of Natural History of New York
+$issns = array('0890-6564');
+$start 	= 1824;
+$end 	= 1877;
+$start 	= 2009;
+$end 	= 2010;
+
+$issns = array('0373-5680');
+$issns = array('1851-7471');
+$start 	= 2015;
+$end 	= 2021;
+
+
+// Berliner entomologische Zeitschrift
+$issns = array('0323-6145');
+$start 	= 1857;
+$end 	= 1874;
+
+// Records of The Western Australian Museum Supplement
+$issns = array('0313-122X');
+$start 	= 1975;
+$end 	= 2020;
+
+// Bulletin of the Natural History Museum: Geology Series
+$issns = array('0968-0462');
+$start 	= 2002;
+$end 	= 2004;
+
+$issns = array('0968-0446');
+$start 	= 2002;
+$end 	= 2002;
+
+// Australian Journal of Zoology Supplementary Series
+$issns = array('0310-9089');
+$start 	= 1971;
+$end 	= 1987;
+
+// Proceedings of the American Academy of Arts and Sciences
+$issns = array('0199-9818');
+$start 	= 1846;
+$end 	= 1958;
+
+// Integrative Systematics: Stuttgart Contributions to Natural History
+$issns = array('2628-2380');
+$start 	= 2018;
+$end 	= 2021;
+
+// Integrative Systematics: Stuttgart Contributions to Natural History
+$issns = array('0341-0145');
+$start 	= 2016;
+$end 	= 2017;
+
+// Zoosystematica Rossica
+$issns = array('0320-9180');
+$start 	= 2005;
+$end 	= 2021;
+
+// Medical Entomology and Zoology
+$issns = array('0424-7086');
+$start 	= 1950;
+$end 	= 2021;
+
+$start 	= 1989;
+$end 	= 2021;
+
+
+// Biota Colombiana
+$issns = array('0124-5376');
+$start 	= 2000;
+$end 	= 2021;
+
+
+// american journal of science
+$issns = array('0002-9599');
+$start 	= 1860;
+$end 	= 1900;
+
+$start 	= 1900;
+$end 	= 1950;
+
+$start 	= 1950;
+$end 	= 1970;
+
+$start 	= 1971;
+$end 	= 2021;
+
+
+// nz j zool
+$issns = array('0301-4223');
+$start 	= 1974;
+$end 	= 2021;
+
+$issns = array('0021-2210');
+$start 	= 2000;
+$end 	= 2005;
+
+
+// Taxon
+$issns = array('0040-0262');
+$start 	= 1959;
+$end 	= 2021;
+
+
+$start 	= 1950;
+$end 	= 1959;
+
+
+$issns = array('0022-3395');
+$start 	= 1914;
+$end 	= 2021;
+
+$issns = array('1323-5818');
+$start 	= 1994;
+$end 	= 2001;
+
+$issns = array('0013-8746');
+$start 	= 1953;
+$end 	= 1953;
+
+
+
+$issns = array('2080-945X');
+$start 	= 2009;
+$end 	= 2021;
+
+
+$issns = array('1945-9475');
+$start 	= 1853;
+$end 	= 1857;
+
+$issns = array('0368-2935');
+$start 	= 1865;
+$end 	= 1968;
+
+$issns = array('0024-4082');
+$start 	= 1968;
+$end 	= 2021;
+
+
+$issns=array(
+'0035-418X',
+);
+$start 	= 1893;
+$end 	= 2021;
+
+$start 	= 2005;
+$end 	= 2006;
+
+
+$issns = array('0037-928X');
+$start 	= 2018;
+$end 	= 2021;
+$start 	= 1896;
+$end 	= 1898;
+
+
+
+$issns = array('2200-4025');
+$start 	= 2019;
+$end 	= 2021;
+
+$issns = array('1908-6865');
+$start 	= 2007;
+$end 	= 2021;
+
+$issns = array('1810-522X');
+$start 	= 2011;
+$end 	= 2016;
+
+$issns = array('0034-7108');
+$start 	= 1998;
+$end 	= 2002;
+
+$issns = array('1026-051X');
+$start 	= 2014;
+$end 	= 2021;
+
+
+
+$issns = array('1545-1410');
+$start 	= 1969;
+$end 	= 2021;
+
+$issns = array('1224-2594');
+$start 	= 2014;
+$end 	= 2022;
+
+
+$issns = array('1684-4866');
+$start 	= 2018;
+$end 	= 2022;
+
+$issns = array('0018-0971');
+$start 	= 2008;
+$end 	= 2022;
+
+
+$issns = array('1560-2745');
+$start 	= 2019;
+$end 	= 2022;
+
+$issns = array('0006-8055');
+$start 	= 2000;
+$end 	= 2010;
 
 
 
@@ -413,7 +663,6 @@ $limit = 1000;
 
 foreach ($issns as $issn)
 {
-
 
 	for ($year = $start; $year <= $end; $year++)
 	{
@@ -444,7 +693,7 @@ foreach ($issns as $issn)
 			
 			if ($go)
 			{
-		
+				$pdf = '';
 		
 				$keys = array();
 				$values = array();
@@ -549,10 +798,12 @@ foreach ($issns as $issn)
 						case 'link':
 							foreach ($v as $link)
 							{
-								if ($link->{'content-type'} == 'application/pdf')
+								if (($link->{'content-type'} == 'application/pdf') && ($pdf == ''))
 								{
 									$keys[] = 'pdf';
-									$values[] = '"' . $link->URL . '"';					
+									$values[] = '"' . $link->URL . '"';		
+									
+									$pdf = $link->URL;	
 								}
 							}					
 							break;
@@ -569,7 +820,9 @@ foreach ($issns as $issn)
 				if (count($keys) > 2)
 				{
 					$sql = 'REPLACE INTO publications(' . join(',', $keys) . ') VALUES (' . join(',', $values) . ');';
-	
+					
+					//$sql = 'REPLACE INTO publications_tmp(' . join(',', $keys) . ') VALUES (' . join(',', $values) . ');';
+
 					echo $sql . "\n";
 				}
 			}

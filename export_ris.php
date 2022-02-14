@@ -574,6 +574,93 @@ $sql = 'SELECT * FROM publications WHERE guid like "https://repository.naturalis
 
 $sql = 'SELECT * FROM publications WHERE issn="0128-5939"';
 
+$sql = 'SELECT * FROM publications WHERE issn="2033-494X"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0722-3773"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0171-0079" and pdf is not null';
+
+
+// plant diversity
+
+$sql = 'SELECT * FROM `publications_tmp` WHERE issn="2096-2703" AND volume BETWEEN 33 AND 37';
+
+
+// PD Acta Yunnanica
+$no_pages = true;
+$no_pages = false;
+
+$sql = 'SELECT * FROM `publications_tmp` WHERE issn="2096-2703" AND volume BETWEEN 27 AND 32 AND pii IS NOT NULL';
+
+$sql = 'SELECT * FROM `publications_tmp` WHERE issn="2096-2703" AND volume < 24 AND year < 1999 AND pii IS NOT NULL';
+
+$sql = 'SELECT * FROM `publications` WHERE issn="0726-9609" AND volume =29';
+
+// Zoological Research
+$sql = 'SELECT * FROM `publications` WHERE issn="2095-8137" AND pii IS NOT NULL';
+
+
+
+$sql = 'SELECT * FROM publications WHERE issn="2337-876X" and pdf is not null and doi IS NOT NULL';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="1851-7471" and pdf is not null';
+
+
+// PD Acta Yunnanica
+$sql = 'SELECT * FROM `publications_tmp` WHERE issn="2096-2703" AND volume in (21,22,23,24,25,26) AND  pii IS NOT NULL';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0079-0354" and pdf is not null';
+
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0770-7622" and pdf is not null and issue LIKE "%(%"';
+
+$sql = 'SELECT * FROM publications_tmp WHERE issn="0968-0462"';
+
+$sql = 'SELECT * FROM publications_tmp WHERE issn="0968-0446"';
+
+$sql = 'SELECT * FROM publications WHERE issn="0024-0974" and pdf IS NOT NULL';
+$sql = 'SELECT * FROM publications WHERE journal="Konowia (Vienna)" and pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications WHERE issn="0073-134X" and pdf IS NOT NULL AND volume IS NOT NULL AND spage IS NOT NULL';
+//$sql = 'SELECT * FROM publications WHERE issn="0073-134X" and pdf IS NOT NULL AND pdf like "%\%%" AND volume IS NOT NULL AND spage IS NOT NULL';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0253-116X" and pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM publications_tmp where issn="2410-0226" and pdf IS NOT NULL AND volume IS NOT NULL AND spage IS NOT NULL';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="2539-200X" and pdf IS NOT NULL and internetarchive IS NULL';
+
+$sql = 'SELECT * FROM publications WHERE pdf="http://revistas.humboldt.org.co/index.php/biota/article/download/718/579"';
+
+$sql = 'SELECT * FROM publications_tmp WHERE pdf="http://www.insect.org.cn/CN/article/downloadArticleFile.do?attachType=PDF&id=520"';
+
+$sql = 'SELECT * FROM publications_tmp WHERE pdf="http://www.insect.org.cn/CN/article/downloadArticleFile.do?attachType=PDF&id=1854"';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0385-2423" and pdf is not null and internetarchive is null';
+
+$sql = 'SELECT * FROM publications WHERE issn="0385-2423" and pdf is not null and internetarchive is null';
+
+$sql = "select * from publications where issn='0387-5733' and wikidata is null and pdf like 'http://bionames.org/%'";
+
+// Bol Chile
+
+//$sql = 'SELECT * FROM publications WHERE issn="0716-2545" and pdf is not null';
+
+
+
+$sql = 'SELECT * FROM `publications_tmp` WHERE guid="http://www.insect.org.cn/CN/abstract/abstract5643.shtml"';
+$sql = 'SELECT * FROM `publications_tmp` WHERE issn="0454-6296" AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM `publications` WHERE issn="0006-8152" AND guid LIKE "https://www.zobodat.at%" AND pdf IS NOT NULL';
+
+$sql = 'SELECT * FROM `journal of the malacological society of australia-wd`';
+
 //$sql = 'SELECT * FROM publications WHERE issn IN("0097-0425","1050-4842")';
 
 
@@ -581,11 +668,101 @@ $sql = 'SELECT * FROM publications WHERE issn="0128-5939"';
 
 //$sql = 'SELECT * FROM publications WHERE issn="0312-3162" and year =2008 and biostor is null';
 
+$sql = 'SELECT * FROM publications WHERE issn="1641-8190" and pdf is not null';
+
+$sql = "SELECT * FROM publications WHERE doi in ('10.1515/pbj-2016-0021','10.1515/pbj-2016-0020','10.1515/pbj-2016-0012','10.1515/pbj-2016-0023','10.1515/pbj-2016-0013','10.1515/pbj-2016-0011','10.2478/pbj-2014-0015')";
+
+
+$sql = 'SELECT * FROM publications_tmp WHERE issn="0206-0477" and pdf is not null';
+
+$sql = 'SELECT * FROM publications WHERE issn="0368-1254" and pdf is not null';
+
+$sql = 'SELECT * FROM publications WHERE issn="1978-9807" and pdf is not null and volume is not null and spage is not null';
+
+$sql = 'SELECT * FROM publications WHERE issn="0013-886X"';
+
+$sql = 'SELECT * FROM publications_tmp WHERE issn="0037-928X" AND pdf IS NOT NULL and guid like "https://lasef.org/wp-content/uploads/%"';
+
+$sql = 'SELECT * FROM publications WHERE issn="1908-6865" AND pdf IS NOT NULL and volume=14';
+$sql = 'SELECT * FROM publications WHERE issn="1908-6865" AND pdf IS NOT NULL';
+
+
+$sql = 'SELECT * FROM publications WHERE issn="0013-9440" AND pdf IS NOT NULL';
+$sql = 'SELECT * FROM publications WHERE issn="2444-8192" AND pdf IS NOT NULL';
+
+$sql = "SELECT * FROM publications WHERE issn='2444-8192' AND pdf IN ('https://raco.cat/index.php/BolletiSHNBalears/article/download/208529/277716','https://raco.cat/index.php/BolletiSHNBalears/article/download/264180/351833','https://raco.cat/index.php/BolletiSHNBalears/article/download/264181/351834','https://raco.cat/index.php/BolletiSHNBalears/article/download/264182/351835','https://raco.cat/index.php/BolletiSHNBalears/article/download/264183/351836','https://raco.cat/index.php/BolletiSHNBalears/article/download/264184/351837','https://raco.cat/index.php/BolletiSHNBalears/article/download/264185/351838','https://raco.cat/index.php/BolletiSHNBalears/article/download/264186/351839','https://raco.cat/index.php/BolletiSHNBalears/article/download/264187/351840','https://raco.cat/index.php/BolletiSHNBalears/article/download/264188/351841','https://raco.cat/index.php/BolletiSHNBalears/article/download/264189/351842','https://raco.cat/index.php/BolletiSHNBalears/article/download/264190/351843','https://raco.cat/index.php/BolletiSHNBalears/article/download/264191/351844','https://raco.cat/index.php/BolletiSHNBalears/article/download/264192/351845','https://raco.cat/index.php/BolletiSHNBalears/article/download/264193/351846','https://raco.cat/index.php/BolletiSHNBalears/article/download/286548/374687','https://raco.cat/index.php/BolletiSHNBalears/article/download/286549/374688','https://raco.cat/index.php/BolletiSHNBalears/article/download/286550/374689','https://raco.cat/index.php/BolletiSHNBalears/article/download/286551/374690','https://raco.cat/index.php/BolletiSHNBalears/article/download/286552/374691','https://raco.cat/index.php/BolletiSHNBalears/article/download/286553/374692','https://raco.cat/index.php/BolletiSHNBalears/article/download/286554/374693','https://raco.cat/index.php/BolletiSHNBalears/article/download/286555/374694','https://raco.cat/index.php/BolletiSHNBalears/article/download/286556/374695','https://raco.cat/index.php/BolletiSHNBalears/article/download/286557/374696','https://raco.cat/index.php/BolletiSHNBalears/article/download/286559/374698','https://raco.cat/index.php/BolletiSHNBalears/article/download/286560/374699','https://raco.cat/index.php/BolletiSHNBalears/article/download/385137/478238')";
+
+$sql = "SELECT * FROM publications WHERE issn='0037-8844' AND volume = 141";
+
+$sql = "SELECT * FROM publications WHERE issn='1179-7193'";
+
+$sql = "SELECT * FROM publications WHERE issn='0082-3074'";
+
+$sql = "SELECT * FROM publications WHERE issn='1323-5818' and volume BETWEEN 15 AND 21";
+$sql = "SELECT * FROM publications WHERE issn='0311-1881' and volume BETWEEN 1 AND 6";
+
+$sql = "select * from publications where issn='0311-1881' and volume between 1 and 6 and epage is not null and biostor is null";
+
+$sql = "select * from publications where issn='0034-7108' and volume is not null and spage is not null and year is not null and doi is null";
+
+$sql = "select * from publications where issn='1474-0036' and pdf IS NOT NULL";
+
+$sql = "select * from publications where issn='2269-6016' and guid like 'http://zoo%'";
+
+$sql = "select * from publications where issn='1026-051X' and doi is not null and pdf is not null";
+
+$sql = "select * from publications where issn='1026-051X' and CAST(volume AS SIGNED) < 337 and pdf is not null";
+
+$sql = "select * from publications_mnhn where issn='0181-0626' and volume=12 and issue=1 and biostor is null";
+
+$sql = "select * from publications_tmp where issn='0027-4070' and volume = 13 and biostor is NULL";
+
+
+$sql = 'select * from `mammalian species-wd` where pdf like "https://www.science.smith.edu%" and wikidata is not null and NOT (doi IN ("10.2307/0.632.1","10.1644/0.692.1")) order by year, cast(volume as signed), cast(issue as signed)';
+
+
+$sql = "select * from publications where issn='0311-1881' and volume in (7,8)";
+
+$sql = "select * from publications where issn='0022-4324' and volume in (27,28) and biostor is null and authors is not null";
+
+$sql = "select * from publications where issn='2007-9133' and pdf is not null";
+
+// Current Science
+$sql = "select * from publications where issn='0011-3891' and pdf is not null and guid='https://wwwops.currentscience.ac.in/Downloads/article_id_093_10_1442_1445_0.pdf'";
+
+$sql = "select * from publications where issn='1560-2745' and doi is null";
+
+$sql = "select * from publications where guid IN (
+'https://www.fungaldiversity.org/fdp/sfdp/27_15.pdf',
+'https://www.fungaldiversity.org/fdp/sfdp/27_11.pdf',
+'https://www.fungaldiversity.org/fdp/sfdp/27_9.pdf',
+'https://www.fungaldiversity.org/fdp/sfdp/27_8.pdf'
+
+
+)";
+
+//$sql = "select * from publications where guid ='https://www.fungaldiversity.org/fdp/sfdp/22-3.pdf'";
+
+//$sql = "select * from `occasional papers texas tech university museum` where volume > 368";
+
+
+//$sql = 'SELECT * FROM `publications-revu-suisse-zoologie` ';
+
+//$sql = 'SELECT * FROM publications WHERE guid in ("9a8331a75e0043eaf4ca63cef544c27c", "49a5a81488a1fbda7122797aa502533f", "7a2d0f3996ff19a9acab07cde78449a7", "68d23a59d1df63fca39e7c47bba830b4","ddf0f886d194d04e44f86b8448baa232","8294ef0066e996a41543c96214db2bb9","da445994a97b6caf79ed7377fe7fd066","c359f3f8e1d055fb3558c01590703da3")';
+
+//$sql = 'SELECT * FROM publications WHERE guid="http://rcin.org.pl/dlibra/doccontent?id=57921"';
+
 
 // $sql = 'SELECT * FROM publications_amnh WHERE pdf IS NOT NULL';
-$sql .= ' ORDER BY CAST(series as SIGNED), CAST(volume as SIGNED), issue, CAST(spage as SIGNED)';
+//$sql .= ' ORDER BY CAST(volume as SIGNED), issue, CAST(spage as SIGNED)';
+$sql .= ' ORDER BY CAST(volume as SIGNED), issue, CAST(article_number as SIGNED), CAST(spage as SIGNED)';
 
 //$sql .= ' LIMIT 1000 OFFSET 1000';
+
+// citation parsing
+//$sql = 'SELECT * FROM publications WHERE title LIKE "%Mr.%" LIMIT 10;';
+//$sql = 'SELECT * FROM publications WHERE title LIKE "%n. sp.%" LIMIT 10;';
+//$sql = 'SELECT * FROM publications WHERE title REGEXP "[0-9]{4} " AND year=1980 LIMIT 10;';
 
 
 
@@ -619,12 +796,23 @@ while (!$result->EOF)
 					$authors = preg_split("/;/u", $v);
 					foreach ($authors as $a)
 					{
-						$ris .= "AU  - " . $a ."\n";
+						if (trim($a) != "")
+						{
+							$ris .= "AU  - " . $a ."\n";
+						}
 						//$ris .= "AU  - " . $a ."\n";
 					}
 					//$ris .= $authors[0] . "\n";
 				}
 				break;
+				
+			case 'date':
+				if (strlen($v) == 4)
+				{
+					$ris .= "PY" . "  - " . str_replace('-', '/', $result->fields['date']) . "///\n";
+				}
+				break;
+				
 				
 			case 'year':
 					if ($result->fields['date'] == '')
@@ -644,13 +832,64 @@ while (!$result->EOF)
 				break;
 				
 			case 'pdf':
-				if ($result->fields['sha1'] == '')
+				$go = true;
+				//$go = false;
+				// check if local file stored in PII
+				if ($result->fields['pii'] != '')
 				{
-					$ris .= $field_to_ris_key[$k] . "  - " . $v . "\n";
+					//$ris .= $field_to_ris_key[$k] . "  - " . $result->fields['pii'] . "\n";
+					$ris .= $field_to_ris_key[$k] . "  - file://" . $result->fields['pii'] . ".pdf" . "\n";
+					
+					$go = false;
+					
+				}
+				
+				// check if stored in XML
+				if ($result->fields['xml'] != '' && preg_match('/\.pdf$/i', $result->fields['xml']))
+				{
+					$ris .= $field_to_ris_key[$k] . "  - " . $result->fields['xml'] . "\n";
+					//$ris .= $field_to_ris_key[$k] . "  - file://" . $result->fields['pii'] . ".pdf" . "\n";
+					
+					$go = false;
+					
+				}
+				
+				
+				if ($go)
+				{
+					if ($result->fields['sha1'] == '')
+					{
+						$ris .= $field_to_ris_key[$k] . "  - " . $v . "\n";
+						
+						
+					}
 				}
 				break;
-			
-			
+				
+			case 'spage':
+			case 'epage':
+				if ($no_pages)
+				{
+					// eat as data is bad
+				}
+				else
+				{
+					if ($v != '')
+					{
+						$ris .= $field_to_ris_key[$k] . "  - " .  $v . "\n"; 					
+					}
+				}
+				break;
+				
+			case 'url':
+				$go = true;
+				$go = false;
+				if ($go)
+				{
+					$ris .= $field_to_ris_key[$k] . "  - " .  $v . "\n"; 	
+				}
+				break;
+				
 				
 			default:
 				if ($v != '')
@@ -669,7 +908,7 @@ while (!$result->EOF)
 						}
 						
 					
-						$ris .= $field_to_ris_key[$k] . "  - " . $v . "\n";
+						$ris .= $field_to_ris_key[$k] . "  - " .  html_entity_decode($v, ENT_QUOTES | ENT_HTML5, 'UTF-8') . "\n"; 
 					}
 				}
 				break;

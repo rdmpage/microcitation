@@ -203,6 +203,11 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 				$a['PERSEE']= $author->PERSEE;
 			}
 			
+			if (isset($author->ZOOBANK))
+			{
+				$a['ZOOBANK']= $author->ZOOBANK;
+			}			
+			
 			if (isset($author->idref))
 			{
 				$a['IDREF']= $author->idref;
@@ -335,6 +340,12 @@ function reference_to_citeprocjs($reference, $id = 'ITEM-1')
 					$citeproc_obj['JSTOR'] = $identifier->id;
 					$citeproc_obj['alternative-id'][] = 'JSTOR:' . $identifier->id;
 					break;
+					
+				case 'persee':
+					$citeproc_obj['PERSEE'] = $identifier->id;
+					//$citeproc_obj['alternative-id'][] = 'CNKI:' . $identifier->id;
+					break;
+					
 
 				case 'pmid':
 					$citeproc_obj['PMID'] = $identifier->id;

@@ -137,7 +137,7 @@ $db->EXECUTE("set names 'utf8'");
 
 //--------------------------------------------------------------------------------------------------
 
-$sql = 'SELECT * FROM ' . $table . ' WHERE guid="' . $guid . '"';
+$sql = 'SELECT * FROM `' . $table . '` WHERE guid="' . $guid . '"';
 
 //$sql = 'SELECT * FROM publications_tmp WHERE guid="' . $guid . '"';
 
@@ -186,7 +186,7 @@ if ($result->NumRows() == 1)
 	
 	$wikidata = ''; // empty by default, but we use this as the id if we have it.
 	
-	//print_r($result);
+	// print_r($result);
 	
 	$thumbnail_url = '';
 
@@ -202,6 +202,7 @@ if ($result->NumRows() == 1)
 	}
 	
 	$reference->title = $result->fields['title'];
+	$reference->title = html_entity_decode($reference->title, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 	$reference->title = strip_tags($reference->title);
 	
 	// special cases
@@ -335,6 +336,8 @@ if ($result->NumRows() == 1)
 		$reference->author = json_decode($result->fields['authors_structured']);
 	}
 	
+	//print_r($reference);
+	
 	
 	// identifiers and links
 	
@@ -463,6 +466,18 @@ if ($result->NumRows() == 1)
 			
 			$cnki= 	$m['id'];
 		}	
+		
+		// http://www.cnki.net/kcms/detail/detail.aspx?dbCode=CJFD&filename=WYKX199300008
+		if (preg_match('/\?dbCode=[A-Z]+&filename=(?<id>.*)/', $result->fields['url'], $m))
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'cnki';
+			$identifier->id = $m['id'];
+			$reference->identifier[] = $identifier;	
+			
+			$cnki= 	$m['id'];
+		}	
+		
 	}
 	
 	if ($result->fields['cnki'] != '' && ($cnki == ''))
@@ -517,7 +532,14 @@ if ($result->NumRows() == 1)
 			$use_url = false;
 		}	
 				
-		
+		// Persee
+		if (preg_match('/www.persee.fr\/doc\/(?<id>.*)/', $result->fields['url'], $m))
+		{
+			$identifier = new stdclass;
+			$identifier->type = 'persee';
+			$identifier->id = $m['id'];
+			$reference->identifier[] = $identifier;		
+		}	
 	
 		if ($use_url)
 		{
@@ -688,6 +710,8 @@ if ($result->NumRows() == 1)
 	{
 		$reference->license = $result->fields['license'];
 	}	
+	
+	// print_r($reference);
 
 	// multilingual data
 	
@@ -700,6 +724,8 @@ if ($result->NumRows() == 1)
 		$key = $result->fields['key'];
 		$language = $result->fields['language'];
 		$value = $result->fields['value'];
+		
+		$value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 		
 		//echo $value . '<br/>';
 	
@@ -803,7 +829,7 @@ if ($result->NumRows() == 1)
 		}
 		
 		
-		
+		// print_r($reference);
 		
 				
 		$result->MoveNext();

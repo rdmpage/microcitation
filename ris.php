@@ -445,6 +445,16 @@ function process_ris_key($key, $value, &$obj)
 				
 					$obj->identifier[] = $identifier;				
 				}
+				
+				if (preg_match('/https?:\/\/(direct\.)?biostor.org\/reference\/(?<id>.*)/', $value, $m))
+				{
+					$identifier = new stdclass;
+					$identifier->type = 'biostor';
+					$identifier->id = $m['id'];
+				
+					$obj->identifier[] = $identifier;				
+				}
+				
 			
 			}			
 			break;			
